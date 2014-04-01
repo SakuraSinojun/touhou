@@ -7,6 +7,7 @@
 #include <list>
 
 class GameMapLayer;
+class StatusLayer;
 class GameScene : public  cocos2d::CCLayer
 {
 public:
@@ -14,6 +15,9 @@ public:
     static cocos2d::CCScene* scene();
 
     CREATE_FUNC(GameScene);
+
+
+    void onBackFromStatusLayer();
 
 private:
     cocos2d::CCTMXTiledMap* bg;
@@ -24,7 +28,8 @@ private:
     unsigned int        mClickTime;
     cocos2d::CCPoint    mClickPoint;
 
-    GameMapLayer*        mGameMap;
+    GameMapLayer*       mGameMap;
+    StatusLayer*        mStatusLayer;
 
     cocos2d::CCSprite*  mGrid;
 
@@ -73,6 +78,10 @@ private:
     void hideGrid();
 
     void onMapMoveFinished(cocos2d::CCNode* sender);
+
+    void onMenuStatus(cocos2d::CCObject* pSender);
+    void onMenuMagic(cocos2d::CCObject* pSender);
+
 private:
 
     typedef void (GameScene::*WalkFunc)(void);

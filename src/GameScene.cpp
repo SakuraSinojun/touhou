@@ -1,6 +1,9 @@
 
 #include "GameScene.h"
 #include "GameMapLayer.h"
+
+#include "StatusLayer.h"
+
 #include "logging.h"
 
 USING_NS_CC;
@@ -50,12 +53,25 @@ bool GameScene::init()
     mGrid->setVisible(false);
     this->addChild(mGrid, 11);
 
-    this->setTouchEnabled(true);
-    CCDirector::sharedDirector()->getKeypadDispatcher()->addDelegate(this);
-    
+   
     pDebug = CCLabelTTF::create("DEBUG", "Marker Felt", 32);
     pDebug->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
+    pDebug->setVisible(false);
     this->addChild(pDebug, 300);
+
+    mStatusLayer = StatusLayer::create();
+    mStatusLayer->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
+    mStatusLayer->setVisible(false);
+    this->addChild(mStatusLayer, 100);
+
+
+    CCMenuItemFont* pStatus = CCMenuItemFont::create("Status", this, menu_selector(GameScene::onMenuStatus));
+    CCMenuItemFont* pMagic  = CCMenuItemFont::create("Magic", this, menu_selector(GameScene::onMenuMagic));
+    CCMenu* menu = CCMenu::create(pStatus, pMagic, NULL);
+    menu->alignItemsHorizontally();
+    menu->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + 32));
+    this->addChild(menu);
+
 
     mClickTime = 0;
     bMoving = false;
@@ -65,6 +81,9 @@ bool GameScene::init()
     lastScale = 0.0f;
     mScaleDistance = 0.0f;
 
+    this->setTouchEnabled(true);
+    CCDirector::sharedDirector()->getKeypadDispatcher()->addDelegate(this);
+ 
     return true;
 }
 
@@ -543,6 +562,23 @@ void GameScene::onMapMoveFinished(cocos2d::CCNode* sender)
     } else {
         bMoving = false;
     }
+}
+
+void GameScene::onMenuStatus(cocos2d::CCObject* pSender)
+{
+    this->setTouchEnabled(false);
+    mStatusLayer->setVisible(true);
+    mStatusLayer->onShow();
+}
+
+void GameScene::onMenuMagic(cocos2d::CCObject* pSender)
+{
+}
+
+void GameScene::onBackFromStatusLayer()
+{
+    this->setTouchEnabled(true);
+    mStatusLayer->setVisible(false);
 }
 
 
