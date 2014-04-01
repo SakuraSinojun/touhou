@@ -6,7 +6,7 @@
 USING_NS_CC;
 
 
-#define MAPMOVETIMEPERGRID  0.3f
+#define MAPMOVETIMEPERGRID  0.15f
 
 
 CCScene* GameScene::scene()
@@ -130,8 +130,8 @@ void GameScene::onClick(cocos2d::CCPoint point)
     lastGrid = pt;
 
     CCPoint cl = gridToMap(pt);
-    RUN_HERE() << "Hero : (" << mHero.x << ", " << mHero.y << ")";
-    RUN_HERE() << "Click: (" << cl.x << ", " << cl.y << ")";
+    // RUN_HERE() << "Hero : (" << mHero.x << ", " << mHero.y << ")";
+    // RUN_HERE() << "Click: (" << cl.x << ", " << cl.y << ")";
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -250,7 +250,7 @@ void GameScene::WalkSouth(void)
     for (int i=0; i < 2; i++) {
         animation->addSpriteFrameWithTexture(texture, CCRectMake(i * w, 0, w, h));
     }
-    animation->setDelayPerUnit(0.25f);
+    animation->setDelayPerUnit(MAPMOVETIMEPERGRID / 2.0f);
     CCAnimate* animate = CCAnimate::create(animation);
     hero->runAction(CCRepeatForever::create(animate));
 

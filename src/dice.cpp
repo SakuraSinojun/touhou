@@ -10,7 +10,8 @@ static bool g_inited = false;
 
 void dice_init(void)
 {
-    srand((unsigned int)time(NULL));
+    // srand((unsigned int)time(NULL));
+    srand(0);
 }
 
 int dice(int faces, int times)

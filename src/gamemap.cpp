@@ -51,33 +51,87 @@ public:
 GameMap::Chunk::Chunk(GameMap::ChunkId _id)
     : id(_id)
 {
-    int x = CHUNKWIDTH * id.x;
-    int y = CHUNKHEIGHT * id.y;
     GameMap::Node* n;
     int j, i;
-    for (j=0; j<CHUNKHEIGHT; j++) {
-        for (i=0; i<CHUNKWIDTH; i++) {
-            nodes[j][i].x = x + i;
-            nodes[j][i].y = y + j;
-            n = &nodes[j][i];
+    int d = sadv::dice(20, 1);
+    if (d <= 10) {
+        int w = 5 + sadv::dice(CHUNKWIDTH - 7, 1);
+        int h = 5 + sadv::dice(CHUNKHEIGHT - 7, 1);
+        int x = sadv::dice(CHUNKWIDTH - w, 1);
+        int y = sadv::dice(CHUNKHEIGHT - h, 1);
 
-            int d = sadv::dice(100, 1);
-            if (d < 70) {
+        for (j=0; j<CHUNKHEIGHT; j++) {
+            for (i=0; i<CHUNKWIDTH; i++) {
+                nodes[j][i].x = x + i;
+                nodes[j][i].y = y + j;
+                n = &nodes[j][i];
                 n->type = NODE_GRASS;
                 n->blocksight = false;
                 n->canpass = true;
-            } else if (d < 80) {
-                n->type = NODE_DIRT;
-                n->blocksight = false;
-                n->canpass = false;
-            } else if (d < 90) {
-                n->type = NODE_TREE;
-                n->blocksight = true;
-                n->canpass = false;
+            } 
+        }
+        for (j=y; j<y + h; j++) {
+            for (i=x; i<x + w; i++) {
+                n = &nodes[j][i];
+                if (i == x || j == y || i == (x + w - 1) || j == (y + h - 1)) {
+                    n->type = NODE_TREE;
+                    n->blocksight = false;
+                    n->canpass = false;
+                } else {
+                    n->type = NODE_DIRT;
+                    n->blocksight = false;
+                    n->canpass = true;
+                }
+            }
+        }
+        int di = sadv::dice(4, 1);
+        int dp = -1;
+        if (di < 3) {
+            dp = x + sadv::dice(w - 2, 1);
+            if (di == 1) {
+                n = &nodes[y][dp];
             } else {
-                n->type = NODE_WATER;
-                n->blocksight = false;
-                n->canpass = false;
+                n = &nodes[y + h - 1][dp];
+            }
+        } else {
+            dp = y + sadv::dice(h - 2, 1);
+            if (di == 3) {
+                n = &nodes[dp][x];
+            } else {
+                n = &nodes[dp][x + w - 1];
+            }
+        }
+        n->type = NODE_DIRT;
+        n->canpass = true;
+    } else {
+        int x = CHUNKWIDTH * id.x;
+        int y = CHUNKHEIGHT * id.y;
+
+        // normal
+        for (j=0; j<CHUNKHEIGHT; j++) {
+            for (i=0; i<CHUNKWIDTH; i++) {
+                nodes[j][i].x = x + i;
+                nodes[j][i].y = y + j;
+                n = &nodes[j][i];
+
+                int d = sadv::dice(100, 1);
+                if (d < 70) {
+                    n->type = NODE_GRASS;
+                    n->blocksight = false;
+                    n->canpass = true;
+                } else if (d < 80) {
+                    n->type = NODE_DIRT;
+                    n->blocksight = false;
+                    n->canpass = false;
+                } else if (d < 90) {
+                    n->type = NODE_TREE;
+                    n->blocksight = true;
+                    n->canpass = false;
+                } else {
+                    n->type = NODE_WATER;
+                    n->blocksight = false;
+                    n->canpass = false;
+                }
             }
         }
     }
@@ -171,7 +225,7 @@ void GameMap::centerMap(int x, int y)
 }
 
 bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
-{
+{/*{{{*/
     std::list<Pt> OpenTable;
     std::list<Pt> ClosedTable;
 
@@ -193,7 +247,7 @@ bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
 
         OpenTable.pop_front();
 
-        if (index > 100)
+        if (index > 500)
             return false;
 
         int x, y;
@@ -268,7 +322,7 @@ bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
         fp((*it).x, (*it).y);
     }
     return true;
-}
+}/*}}}*/
 
 
 
