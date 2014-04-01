@@ -33,6 +33,13 @@ private:
     bool bMoving;
 
 private:
+    // for mobile
+    float lastScale;
+    float mScaleDistance;
+
+    cocos2d::CCLabelTTF* pDebug;
+
+private:
     void registerWithTouchDispatcher();
 
     void ccTouchesBegan(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent);

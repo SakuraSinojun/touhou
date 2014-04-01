@@ -53,10 +53,17 @@ bool GameScene::init()
     this->setTouchEnabled(true);
     CCDirector::sharedDirector()->getKeypadDispatcher()->addDelegate(this);
     
+    pDebug = CCLabelTTF::create("DEBUG", "Marker Felt", 32);
+    pDebug->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
+    this->addChild(pDebug, 300);
+
     mClickTime = 0;
     bMoving = false;
 
     // this->setScale(1.5f);
+
+    lastScale = 0.0f;
+    mScaleDistance = 0.0f;
 
     return true;
 }
@@ -77,9 +84,42 @@ void GameScene::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 
 void GameScene::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
 {
-    CCTouch* touch = (CCTouch*)(pTouches->anyObject());
-    singleTouchDragging(mDragStartPoint, touch->getLocation());
-    mDragStartPoint = touch->getLocation();
+    if (pTouches->count() == 2) {
+
+        CCSetIterator it1 = pTouches->begin();
+        CCSetIterator it2 = it1;
+        it2++;
+        CCPoint pt1 = ((CCTouch*)(*it1))->getLocation();
+        CCPoint pt2 = ((CCTouch*)(*it2))->getLocation();
+        float dist = sqrt((pt1.x - pt2.x) * (pt1.x - pt2.x) + (pt1.y - pt2.y) * (pt1.y - pt2.y));
+
+        if (lastScale < 1.0f || mScaleDistance == 0.0f) {
+            lastScale = this->getScale();
+            mScaleDistance = dist;
+        }
+
+        float scale =  lastScale * (dist / mScaleDistance);
+
+        { 
+            char    temp[4096];
+            snprintf(temp, sizeof(temp), "%f/%f/%f", dist, mScaleDistance, scale);
+            pDebug->setString(temp);
+        }
+
+        if (scale < 1.0f)
+            scale = 1.0f;
+        if (scale > 2.0f)
+            scale = 2.0f;
+
+        lastScale = scale;
+        mScaleDistance = dist;
+
+        this->setScale(scale);
+    } else {
+        CCTouch* touch = (CCTouch*)(pTouches->anyObject());
+        singleTouchDragging(mDragStartPoint, touch->getLocation());
+        mDragStartPoint = touch->getLocation();
+    }
 }
 
 void GameScene::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
@@ -90,6 +130,10 @@ void GameScene::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
     if (fabs(d.x) < 2.0f && fabs(d.y) < 2.0f) {
         onClick(pt);
     }
+
+    lastScale = 0.0f;
+    mScaleDistance = 0.0f;
+    pDebug->setString("END");
 }
 
 void GameScene::singleTouchDragging(CCPoint startPoint, CCPoint now)
