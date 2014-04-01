@@ -27,7 +27,7 @@ void StatusLayer::registerWithTouchDispatcher()
 void StatusLayer::ccTouchesBegan(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent)
 {
     RUN_HERE();
-    GameScene* s = (GameScene*)(this->getParent());
+    GameSceneMainLayer* s = (GameSceneMainLayer*)(this->getParent());
     s->onBackFromStatusLayer();
 }
 

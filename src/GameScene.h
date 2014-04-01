@@ -8,6 +8,24 @@
 
 class GameMapLayer;
 class StatusLayer;
+
+class GameScene;
+class GameSceneMainLayer : public cocos2d::CCLayer
+{
+public:
+    CREATE_FUNC(GameSceneMainLayer);
+    virtual bool init();
+
+    void onBackFromStatusLayer();
+
+private:
+    GameScene*          mGameLayer;
+    StatusLayer*        mStatusLayer;
+
+    void onMenuStatus(cocos2d::CCObject* pSender);
+    void onMenuMagic(cocos2d::CCObject* pSender);
+};
+
 class GameScene : public  cocos2d::CCLayer
 {
 public:
@@ -17,7 +35,6 @@ public:
     CREATE_FUNC(GameScene);
 
 
-    void onBackFromStatusLayer();
 
 private:
     cocos2d::CCTMXTiledMap* bg;
@@ -29,7 +46,6 @@ private:
     cocos2d::CCPoint    mClickPoint;
 
     GameMapLayer*       mGameMap;
-    StatusLayer*        mStatusLayer;
 
     cocos2d::CCSprite*  mGrid;
 
@@ -78,9 +94,6 @@ private:
     void hideGrid();
 
     void onMapMoveFinished(cocos2d::CCNode* sender);
-
-    void onMenuStatus(cocos2d::CCObject* pSender);
-    void onMenuMagic(cocos2d::CCObject* pSender);
 
 private:
 

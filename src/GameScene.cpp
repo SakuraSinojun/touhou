@@ -12,10 +12,62 @@ USING_NS_CC;
 #define MAPMOVETIMEPERGRID  0.15f
 
 
+bool GameSceneMainLayer::init()
+{
+    if (!CCLayer::init()) {
+        return false;
+    }
+
+    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+ 
+    mGameLayer = GameScene::create();
+    this->addChild(mGameLayer);
+
+    mStatusLayer = StatusLayer::create();
+    mStatusLayer->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
+    mStatusLayer->setVisible(false);
+    this->addChild(mStatusLayer, 100);
+
+    CCMenuItemFont* pStatus = CCMenuItemFont::create("Status", this, menu_selector(GameSceneMainLayer::onMenuStatus));
+    CCMenuItemFont* pMagic  = CCMenuItemFont::create("Magic", this, menu_selector(GameSceneMainLayer::onMenuMagic));
+    CCMenu* menu = CCMenu::create(pStatus, pMagic, NULL);
+    menu->alignItemsHorizontally();
+    menu->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + 32));
+    this->addChild(menu, 200);
+
+
+    return true;
+}
+
+void GameSceneMainLayer::onMenuStatus(cocos2d::CCObject* pSender)
+{
+    if (mStatusLayer->isVisible()) {
+        onBackFromStatusLayer();
+    } else {
+        mGameLayer->setTouchEnabled(false);
+        mStatusLayer->setVisible(true);
+        mStatusLayer->onShow();
+    }
+}
+
+void GameSceneMainLayer::onMenuMagic(cocos2d::CCObject* pSender)
+{
+}
+
+void GameSceneMainLayer::onBackFromStatusLayer()
+{
+    mGameLayer->setTouchEnabled(true);
+    mStatusLayer->setVisible(false);
+}
+
+
+
+
 CCScene* GameScene::scene()
 {
     CCScene* scene = CCScene::create();
-    GameScene* layer = GameScene::create();
+    GameSceneMainLayer* layer = GameSceneMainLayer::create();
     scene->addChild(layer);
     return scene;
 }
@@ -59,24 +111,11 @@ bool GameScene::init()
     pDebug->setVisible(false);
     this->addChild(pDebug, 300);
 
-    mStatusLayer = StatusLayer::create();
-    mStatusLayer->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
-    mStatusLayer->setVisible(false);
-    this->addChild(mStatusLayer, 100);
-
-
-    CCMenuItemFont* pStatus = CCMenuItemFont::create("Status", this, menu_selector(GameScene::onMenuStatus));
-    CCMenuItemFont* pMagic  = CCMenuItemFont::create("Magic", this, menu_selector(GameScene::onMenuMagic));
-    CCMenu* menu = CCMenu::create(pStatus, pMagic, NULL);
-    menu->alignItemsHorizontally();
-    menu->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + 32));
-    this->addChild(menu);
-
 
     mClickTime = 0;
     bMoving = false;
 
-    // this->setScale(1.5f);
+    this->setScale(1.5f);
 
     lastScale = 0.0f;
     mScaleDistance = 0.0f;
@@ -563,23 +602,5 @@ void GameScene::onMapMoveFinished(cocos2d::CCNode* sender)
         bMoving = false;
     }
 }
-
-void GameScene::onMenuStatus(cocos2d::CCObject* pSender)
-{
-    this->setTouchEnabled(false);
-    mStatusLayer->setVisible(true);
-    mStatusLayer->onShow();
-}
-
-void GameScene::onMenuMagic(cocos2d::CCObject* pSender)
-{
-}
-
-void GameScene::onBackFromStatusLayer()
-{
-    this->setTouchEnabled(true);
-    mStatusLayer->setVisible(false);
-}
-
 
 
