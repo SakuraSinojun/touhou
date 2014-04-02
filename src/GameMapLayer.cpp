@@ -39,6 +39,7 @@ void GameMapLayer::centerMap(cocos2d::CCPoint point)
 
 cocos2d::CCPoint GameMapLayer::getMapCenter()
 {
+    return ccp(mGameMap.centerX, mGameMap.centerY);
 }
 
 void GameMapLayer::registerWithTouchDispatcher()

@@ -115,7 +115,7 @@ bool GameScene::init()
     mClickTime = 0;
     bMoving = false;
 
-    this->setScale(1.5f);
+    // this->setScale(1.5f);
 
     lastScale = 0.0f;
     mScaleDistance = 0.0f;
@@ -196,16 +196,37 @@ void GameScene::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
 
 void GameScene::singleTouchDragging(CCPoint startPoint, CCPoint now)
 {
-    /*
     CCPoint d = ccpSub(now, startPoint);
-    CCPoint n = ccpAdd(bg->getPosition(), d);
+    d.x /= this->getScale();
+    d.y /= this->getScale();
+    CCPoint n = ccpAdd(mGameMap->getPosition(), d);
 
-    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    // CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-    */
-    RUN_HERE() << "width = " << mGameMap->getContentSize().width;
- 
-    // bg->setPosition(n);
+    // RUN_HERE() << "width = " << mGameMap->getContentSize().width;
+
+    CCPoint center = mGameMap->getMapCenter();
+    if (n.x > origin.x + 32) {
+        n.x = origin.x;
+        center.x--;
+        mGameMap->centerMap(center);
+    }
+    if (n.y > origin.y + 32) {
+        n.y = origin.y;
+        center.y--;
+        mGameMap->centerMap(center);
+    }
+    if (n.x < origin.x - 32) {
+        n.x = origin.x;
+        center.x++;
+        mGameMap->centerMap(center);
+    }
+    if (n.y < origin.y - 32) {
+        n.y = origin.y;
+        center.y++;
+        mGameMap->centerMap(center);
+    }
+    mGameMap->setPosition(n);
 }
 
 class CHelper {
