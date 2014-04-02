@@ -79,17 +79,30 @@ bool GameScene::init()
         return false;
     }
 
+    static int g_tag = 1000;
+
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
     
     // bg = CCTMXTiledMap::create("test.tmx");
     // this->addChild(bg, 0);
 
-    mGameMap = GameMapLayer::create();
-    this->addChild(mGameMap, 0);
-    mGameMap->centerMap(ccp(mHero.x, mHero.y));
+    mGameMapLayer = GameMapLayer::create();
+    this->addChild(mGameMapLayer, 0);
 
     CCRect  rect(0, 0, 64, 64);
+    CCSprite* s = CCSprite::create("hero.png", rect);
+    s->setTag(g_tag++);
+    // s->initWithFile("hero.png", rect);
+    CCPoint anchor = s->getAnchorPoint();
+    RUN_HERE() << "anchor = (" << anchor.x << ", " << anchor.y << ")";
+    anchor.y -= 0.2;
+    s->setAnchorPoint(anchor);
+    mHero.Attach(s);
+    mGameMapLayer->gamemap().at(mHero.x, mHero.y)->creature = &mHero;
+
+    mGameMapLayer->centerMap(ccp(mHero.x, mHero.y));
+    /*
     hero = CCSprite::create("hero.png", rect);
     CCPoint pt = ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2);
     pt = pointToGrid(pt);
@@ -98,6 +111,7 @@ bool GameScene::init()
 
     hero->setPosition(pt);
     this->addChild(hero, 10);
+    */
 
 
     mGrid = CCSprite::create("RedGrid.png");
@@ -199,34 +213,34 @@ void GameScene::singleTouchDragging(CCPoint startPoint, CCPoint now)
     CCPoint d = ccpSub(now, startPoint);
     d.x /= this->getScale();
     d.y /= this->getScale();
-    CCPoint n = ccpAdd(mGameMap->getPosition(), d);
+    CCPoint n = ccpAdd(mGameMapLayer->getPosition(), d);
 
     // CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
     // RUN_HERE() << "width = " << mGameMap->getContentSize().width;
 
-    CCPoint center = mGameMap->getMapCenter();
+    CCPoint center = mGameMapLayer->getMapCenter();
     if (n.x > origin.x + 32) {
         n.x = origin.x;
         center.x--;
-        mGameMap->centerMap(center);
+        mGameMapLayer->centerMap(center);
     }
     if (n.y > origin.y + 32) {
         n.y = origin.y;
         center.y--;
-        mGameMap->centerMap(center);
+        mGameMapLayer->centerMap(center);
     }
     if (n.x < origin.x - 32) {
         n.x = origin.x;
         center.x++;
-        mGameMap->centerMap(center);
+        mGameMapLayer->centerMap(center);
     }
     if (n.y < origin.y - 32) {
         n.y = origin.y;
         center.y++;
-        mGameMap->centerMap(center);
+        mGameMapLayer->centerMap(center);
     }
-    mGameMap->setPosition(n);
+    mGameMapLayer->setPosition(n);
 }
 
 class CHelper {
@@ -241,6 +255,7 @@ public:
 
 void GameScene::onClick(cocos2d::CCPoint point)
 {
+    return;
     // this->runAction(CCScaleTo::create(0.5, 1.5f));
     // this->setScale(1.5f);
 
@@ -270,7 +285,7 @@ void GameScene::onClick(cocos2d::CCPoint point)
     mPathGrids.clear();
 
     CHelper ch;
-    if (mGameMap->findPath(ccp(mHero.x, mHero.y), cl, ch)) {
+    if (mGameMapLayer->findPath(ccp(mHero.x, mHero.y), cl, ch)) {
         hideGrid();
         std::list<CCPoint>::iterator nit;
         for (nit = ch.nodes.begin(); nit != ch.nodes.end(); nit++) {
@@ -373,6 +388,7 @@ cocos2d::CCPoint GameScene::mapToGrid(cocos2d::CCPoint pMap)
 
 void GameScene::WalkSouth(void)
 {/*{{{*/
+    /*
     CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage("hero.png");
     float w = texture->getContentSize().width / 4.0f;
     float h = texture->getContentSize().width / 4.0f;
@@ -383,13 +399,13 @@ void GameScene::WalkSouth(void)
     animation->setDelayPerUnit(MAPMOVETIMEPERGRID / 2.0f);
     CCAnimate* animate = CCAnimate::create(animation);
     hero->runAction(CCRepeatForever::create(animate));
-
+    */
     mHero.move(0, -1);
 
     CCPoint pt(0, 32);
     CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameScene::onMapMoveFinished));
-    mGameMap->runAction(CCSequence::create(mt, cf, NULL));
+    mGameMapLayer->runAction(CCSequence::create(mt, cf, NULL));
 
     bMoving = true;
 
@@ -414,7 +430,7 @@ void GameScene::WalkNorth(void)
     CCPoint pt(0, -32);
     CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameScene::onMapMoveFinished));
-    mGameMap->runAction(CCSequence::create(mt, cf, NULL));
+    mGameMapLayer->runAction(CCSequence::create(mt, cf, NULL));
 
     bMoving = true;
 
@@ -440,7 +456,7 @@ void GameScene::WalkWest(void)
     CCPoint pt(32, 0);
     CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameScene::onMapMoveFinished));
-    mGameMap->runAction(CCSequence::create(mt, cf, NULL));
+    mGameMapLayer->runAction(CCSequence::create(mt, cf, NULL));
 
     bMoving = true;
 
@@ -466,7 +482,7 @@ void GameScene::WalkEast(void)
     CCPoint pt(-32, 0);
     CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameScene::onMapMoveFinished));
-    mGameMap->runAction(CCSequence::create(mt, cf, NULL));
+    mGameMapLayer->runAction(CCSequence::create(mt, cf, NULL));
 
     bMoving = true;
 
@@ -493,7 +509,7 @@ void GameScene::WalkSouthEast(void)
     CCPoint pt(-32, 32);
     CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameScene::onMapMoveFinished));
-    mGameMap->runAction(CCSequence::create(mt, cf, NULL));
+    mGameMapLayer->runAction(CCSequence::create(mt, cf, NULL));
 
     bMoving = true;
 
@@ -523,7 +539,7 @@ void GameScene::WalkSouthWest(void)
     CCPoint pt(32, 32);
     CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameScene::onMapMoveFinished));
-    mGameMap->runAction(CCSequence::create(mt, cf, NULL));
+    mGameMapLayer->runAction(CCSequence::create(mt, cf, NULL));
 
     bMoving = true;
 
@@ -550,7 +566,7 @@ void GameScene::WalkNorthEast(void)
     CCPoint pt(-32, -32);
     CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameScene::onMapMoveFinished));
-    mGameMap->runAction(CCSequence::create(mt, cf, NULL));
+    mGameMapLayer->runAction(CCSequence::create(mt, cf, NULL));
 
     bMoving = true;
 
@@ -577,7 +593,7 @@ void GameScene::WalkNorthWest(void)
     CCPoint pt(32, -32);
     CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameScene::onMapMoveFinished));
-    mGameMap->runAction(CCSequence::create(mt, cf, NULL));
+    mGameMapLayer->runAction(CCSequence::create(mt, cf, NULL));
 
     bMoving = true;
 
@@ -612,9 +628,9 @@ void GameScene::hideGrid()
 
 void GameScene::onMapMoveFinished(cocos2d::CCNode* sender)
 {
-    mGameMap->setPosition(ccp(0, 0));
-    mGameMap->centerMap(ccp(mHero.x, mHero.y));
-    hero->stopAllActions();
+    mGameMapLayer->setPosition(ccp(0, 0));
+    mGameMapLayer->centerMap(ccp(mHero.x, mHero.y));
+    // hero->stopAllActions();
 
     if (!mPathGrids.empty()) {
         this->removeChild(mPathGrids.front());

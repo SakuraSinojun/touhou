@@ -37,15 +37,15 @@ public:
 
 
 private:
-    cocos2d::CCTMXTiledMap* bg;
-    cocos2d::CCSprite*      hero;
+    // cocos2d::CCTMXTiledMap* bg;
+    // cocos2d::CCSprite*      hero;
 
     cocos2d::CCPoint mDragStartPoint;
 
     unsigned int        mClickTime;
     cocos2d::CCPoint    mClickPoint;
 
-    GameMapLayer*       mGameMap;
+    GameMapLayer*       mGameMapLayer;
 
     cocos2d::CCSprite*  mGrid;
 

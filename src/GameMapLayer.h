@@ -11,9 +11,8 @@ class MapTile;
 class GameMapLayer : public  cocos2d::CCLayer
 {
 public:
+    CREATE_FUNC(GameMapLayer)
     virtual bool init();
-
-    CREATE_FUNC(GameMapLayer);
 
 
     void at(cocos2d::CCPoint point);
@@ -36,6 +35,9 @@ public:
         Helper<CallbackFunctor>  h(fp);
         return mGameMap.findPath(pt1.x, pt1.y, pt2.x, pt2.y, h);
     }
+
+    GameMap& gamemap() { return mGameMap; }
+
 
 private:
     void registerWithTouchDispatcher();

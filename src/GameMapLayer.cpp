@@ -3,6 +3,7 @@
 #include "GameMapLayer.h"
 #include "HeroCreator.h"
 #include "MapTile.h"
+#include "creature.h"
 #include "gamemap.h"
 #include "logging.h"
 
@@ -65,6 +66,17 @@ void GameMapLayer::refreshMap()
     int sx = mGameMap.centerX - MAPWIDTH / 2;
     int sy = mGameMap.centerY - MAPHEIGHT / 2;
 
+    // this->removeAllChildren();
+
+    CCObject* node = NULL;
+    CCARRAY_FOREACH(this->getChildren(), node)
+    {
+        CCNode* n = (CCNode*)node;
+        if (n->getTag() > 0) {
+            n->setVisible(false);
+        }
+    }
+
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
     for (i=0; i<MAPWIDTH; i++) {
@@ -79,8 +91,18 @@ void GameMapLayer::refreshMap()
                 this->addChild(tiles[i][j], 0);
             }
             tiles[i][j]->setType(n->type);
+            tiles[i][j]->setVisible(true);
+            if (n->creature) {
+                CCSprite * s = n->creature->getSprite();
+                if (s) {
+                    s->setPosition(ccp(origin.x + (i - 1) * 32 + 16, origin.y + (j - 1) * 32 + 16));
+                    if (this->getChildByTag(s->getTag()) == NULL) {
+                        this->addChild(s, 10); // , s->getTag());
+                    }
+                    s->setVisible(true);
+                }
+            }
         }
     }
-
 }
 
