@@ -196,8 +196,15 @@ void GameScene::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
 
 void GameScene::singleTouchDragging(CCPoint startPoint, CCPoint now)
 {
-    // CCPoint d = ccpSub(now, startPoint);
-    // CCPoint n = ccpAdd(bg->getPosition(), d);
+    /*
+    CCPoint d = ccpSub(now, startPoint);
+    CCPoint n = ccpAdd(bg->getPosition(), d);
+
+    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+    */
+    RUN_HERE() << "width = " << mGameMap->getContentSize().width;
+ 
     // bg->setPosition(n);
 }
 

@@ -19,6 +19,7 @@ public:
     void at(cocos2d::CCPoint point);
 
     void centerMap(cocos2d::CCPoint point);
+    cocos2d::CCPoint getMapCenter();
 
     template <class U>
     class Helper : public GameMap::FpCallbackFunctor {
@@ -49,5 +50,9 @@ private:
 
     cocos2d::CCPoint    mCurrentPoint;
     GameMap             mGameMap;
+
+public:
+    int getMapLayerWidth() { return MAPWIDTH * 32; }
+    int getMapLayerHeight() { return MAPHEIGHT * 32; }
 };
 

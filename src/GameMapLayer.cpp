@@ -37,6 +37,10 @@ void GameMapLayer::centerMap(cocos2d::CCPoint point)
     refreshMap();
 }
 
+cocos2d::CCPoint GameMapLayer::getMapCenter()
+{
+}
+
 void GameMapLayer::registerWithTouchDispatcher()
 {
     CCDirector::sharedDirector()->getTouchDispatcher()->addStandardDelegate(this, 0);
