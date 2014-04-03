@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 
-#define CHUNKWIDTH  3
+#define CHUNKWIDTH  16 
 #define CHUNKHEIGHT CHUNKWIDTH
 
 
