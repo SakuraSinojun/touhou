@@ -10,6 +10,7 @@
 #define CHUNKHEIGHT CHUNKWIDTH
 
 
+
 class Creature;
 class GameMap
 {
@@ -32,6 +33,7 @@ public:
         int x;
         int y;
         Creature* creature;
+
     };
 
     class ChunkId {

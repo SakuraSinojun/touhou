@@ -115,5 +115,10 @@ extern "C" void logging_LogPrintfC(const char * file, const char * func, int lin
     ::logging::LogMessage(file, func, line).stream() << temp;
 }
 
+std::ostream& operator<<(std::ostream& o, cocos2d::CCPoint& pt)
+{
+    o << "(" << pt.x << ", " << pt.y << ")";
+    return o;
+}
 
 

@@ -31,7 +31,10 @@ bool GameSceneMainLayer::init()
 
     CCMenuItemFont* pStatus = CCMenuItemFont::create("Status", this, menu_selector(GameSceneMainLayer::onMenuStatus));
     CCMenuItemFont* pMagic  = CCMenuItemFont::create("Magic", this, menu_selector(GameSceneMainLayer::onMenuMagic));
-    CCMenu* menu = CCMenu::create(pStatus, pMagic, NULL);
+    CCMenuItemFont* pZoomIn = CCMenuItemFont::create("ZoomIn", this, menu_selector(GameSceneMainLayer::onZoomIn));
+    CCMenuItemFont* pZoomOut= CCMenuItemFont::create("ZoomOut", this, menu_selector(GameSceneMainLayer::onZoomOut));
+
+    CCMenu* menu = CCMenu::create(pStatus, pMagic, pZoomIn, pZoomOut, NULL);
     menu->alignItemsHorizontally();
     menu->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + 32));
     this->addChild(menu, 200);
@@ -53,6 +56,24 @@ void GameSceneMainLayer::onMenuStatus(cocos2d::CCObject* pSender)
 
 void GameSceneMainLayer::onMenuMagic(cocos2d::CCObject* pSender)
 {
+}
+
+void GameSceneMainLayer::onZoomIn(cocos2d::CCObject* pSender)
+{
+    float s = mGameLayer->getScale();
+    s += 0.1;
+    if (s >= 2.0f)
+        s = 2.0f;
+    mGameLayer->setScale(s);
+}
+
+void GameSceneMainLayer::onZoomOut(cocos2d::CCObject* pSender)
+{
+    float s = mGameLayer->getScale();
+    s -= 0.1;
+    if (s <= 1.0f)
+        s = 1.0f;
+    mGameLayer->setScale(s);
 }
 
 void GameSceneMainLayer::onBackFromStatusLayer()
@@ -96,7 +117,7 @@ bool GameScene::init()
     // s->initWithFile("hero.png", rect);
     CCPoint anchor = s->getAnchorPoint();
     RUN_HERE() << "anchor = (" << anchor.x << ", " << anchor.y << ")";
-    anchor.y -= 0.2;
+    anchor.y -= 16.0f / 64.0f;
     s->setAnchorPoint(anchor);
     mHero.Attach(s);
     mGameMapLayer->gamemap().at(mHero.x, mHero.y)->creature = &mHero;
@@ -113,12 +134,13 @@ bool GameScene::init()
     this->addChild(hero, 10);
     */
 
+    /*
 
     mGrid = CCSprite::create("RedGrid.png");
     mGrid->setPosition(ccp(0, 0));
     mGrid->setVisible(false);
     this->addChild(mGrid, 11);
-
+    */
    
     pDebug = CCLabelTTF::create("DEBUG", "Marker Felt", 32);
     pDebug->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
@@ -255,11 +277,22 @@ public:
 
 void GameScene::onClick(cocos2d::CCPoint point)
 {
+    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+
+    CCPoint np = mGameMapLayer->getPosition();
+    point = ccpSub(point, np);
+
+    CCPoint dp;
+    dp.x = (visibleSize.width / 2 * (this->getScale() - 1) + point.x)/ this->getScale();
+    dp.y = (visibleSize.height / 2 * (this->getScale() - 1) + point.y) / this->getScale();
+
+    mGameMapLayer->onClick(dp);
     return;
+
+#if 0
     // this->runAction(CCScaleTo::create(0.5, 1.5f));
     // this->setScale(1.5f);
 
-    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     point.x = (point.x + (this->getScale() - 1) * visibleSize.width / 2.0f) / this->getScale();
     point.y = (point.y + (this->getScale() - 1) * visibleSize.height / 2.0f) / this->getScale();
 
@@ -303,6 +336,7 @@ void GameScene::onClick(cocos2d::CCPoint point)
     } else {
         showGrid(pt);
     }
+#endif
 }
 
 void GameScene::onEnsureMove()
@@ -409,10 +443,12 @@ void GameScene::WalkSouth(void)
 
     bMoving = true;
 
+    /*
     pt = mGrid->getPosition();
     pt.y += 32;
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
+    */
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -434,10 +470,12 @@ void GameScene::WalkNorth(void)
 
     bMoving = true;
 
+    /*
     pt = mGrid->getPosition();
     pt.y -= 32;
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
+    */
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -460,10 +498,12 @@ void GameScene::WalkWest(void)
 
     bMoving = true;
 
+    /*
     pt = mGrid->getPosition();
     pt.x += 32;
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
+    */
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -486,10 +526,12 @@ void GameScene::WalkEast(void)
 
     bMoving = true;
 
+    /*
     pt = mGrid->getPosition();
     pt.x -= 32;
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
+    */
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -513,11 +555,13 @@ void GameScene::WalkSouthEast(void)
 
     bMoving = true;
 
+    /*
     pt = mGrid->getPosition();
     pt.x -= 32;
     pt.y += 32;
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
+    */
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -543,11 +587,13 @@ void GameScene::WalkSouthWest(void)
 
     bMoving = true;
 
+    /*
     pt = mGrid->getPosition();
     pt.x += 32;
     pt.y += 32;
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
+    */
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -570,11 +616,13 @@ void GameScene::WalkNorthEast(void)
 
     bMoving = true;
 
+    /*
     pt = mGrid->getPosition();
     pt.x -= 32;
     pt.y -= 32;
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
+    */
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -597,11 +645,13 @@ void GameScene::WalkNorthWest(void)
 
     bMoving = true;
 
+    /*
     pt = mGrid->getPosition();
     pt.x += 32;
     pt.y -= 32;
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
+    */
 
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
@@ -616,14 +666,16 @@ void GameScene::WalkNorthWest(void)
 
 void GameScene::showGrid(cocos2d::CCPoint grid)
 {
+    /*
     CCPoint pt = gridToPoint(grid);
     mGrid->setPosition(pt);
     mGrid->setVisible(true);
+    */
 }
 
 void GameScene::hideGrid()
 {
-    mGrid->setVisible(false);
+    // mGrid->setVisible(false);
 }
 
 void GameScene::onMapMoveFinished(cocos2d::CCNode* sender)

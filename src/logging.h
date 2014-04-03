@@ -10,6 +10,8 @@
 
 #ifdef __cplusplus
 
+#include "cocos2d.h"
+
 #include <sstream>
 #include <string>
 #include <sys/time.h>
@@ -81,6 +83,8 @@ private:
 };
 
 } // namespace logging
+
+std::ostream& operator<<(std::ostream& o, cocos2d::CCPoint& pt);
 
 #if 1
 #if defined(__GNUC__)

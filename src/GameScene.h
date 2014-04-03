@@ -24,6 +24,8 @@ private:
 
     void onMenuStatus(cocos2d::CCObject* pSender);
     void onMenuMagic(cocos2d::CCObject* pSender);
+    void onZoomIn(cocos2d::CCObject* pSender);
+    void onZoomOut(cocos2d::CCObject* pSender);
 };
 
 class GameScene : public  cocos2d::CCLayer
@@ -47,7 +49,7 @@ private:
 
     GameMapLayer*       mGameMapLayer;
 
-    cocos2d::CCSprite*  mGrid;
+    // cocos2d::CCSprite*  mGrid;
 
     Hero                mHero;
 

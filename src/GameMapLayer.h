@@ -15,8 +15,6 @@ public:
     virtual bool init();
 
 
-    void at(cocos2d::CCPoint point);
-
     void centerMap(cocos2d::CCPoint point);
     cocos2d::CCPoint getMapCenter();
 
@@ -39,9 +37,18 @@ public:
     GameMap& gamemap() { return mGameMap; }
 
 
+    void onClick(cocos2d::CCPoint point);
+
 private:
     void registerWithTouchDispatcher();
     void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
+
+    cocos2d::CCPoint pointToMap(cocos2d::CCPoint point);
+    cocos2d::CCRect  gridToRect(cocos2d::CCPoint grid);
+    cocos2d::CCPoint gridToPoint(cocos2d::CCPoint grid);
+    cocos2d::CCPoint gridToMap(cocos2d::CCPoint grid);
+    cocos2d::CCPoint mapToGrid(cocos2d::CCPoint pMap);
+
 
 #define MAPWIDTH    ((DESIGNWIDTH / 32) + 2)
 #define MAPHEIGHT   ((DESIGNHEIGHT / 32) + 2)
@@ -50,8 +57,10 @@ private:
 
     void refreshMap();
 
-    cocos2d::CCPoint    mCurrentPoint;
     GameMap             mGameMap;
+
+    cocos2d::CCSprite*  mGrid;
+    cocos2d::CCPoint    mGridPosition;
 
 public:
     int getMapLayerWidth() { return MAPWIDTH * 32; }
