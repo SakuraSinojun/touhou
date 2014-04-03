@@ -9,6 +9,16 @@
 
 USING_NS_CC;
 
+class CHelper {
+public:
+    void operator() (int x, int y) {
+        CCPoint pt(x, y);
+        nodes.push_back(pt);
+    }
+    std::list<CCPoint> nodes;
+};
+
+
 bool GameMapLayer::init()
 {/*{{{*/
     if (!CCLayer::init()) {
@@ -66,8 +76,20 @@ void GameMapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* eve
 
 void GameMapLayer::onClick(cocos2d::CCPoint point)
 {
+    CCPoint pt = pointToMap(point);
+    if (pt.x == mGridPosition.x && pt.y == mGridPosition.y) {
+        onEnsureMove();
+        return;
+    }
     mGridPosition = pointToMap(point);
+
+    // CHelper ch;
+
     refreshMap();
+}
+
+void GameMapLayer::onEnsureMove()
+{
 }
 
 #if 0
@@ -193,10 +215,6 @@ void GameMapLayer::refreshMap()
                     }
                     s->setVisible(true);
                 }
-            }
-
-            if (i == 1 && j == 1) {
-                tiles[i][j]->setVisible(false);
             }
         }
     }

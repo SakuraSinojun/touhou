@@ -101,6 +101,6 @@ private:
 
     typedef void (GameScene::*WalkFunc)(void);
     std::list<WalkFunc> mWalkList;
-    std::list<cocos2d::CCSprite*> mPathGrids;
+    // std::list<cocos2d::CCSprite*> mPathGrids;
 };
 

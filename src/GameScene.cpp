@@ -341,6 +341,7 @@ void GameScene::onClick(cocos2d::CCPoint point)
 
 void GameScene::onEnsureMove()
 {
+#if 0
     if (mPathGrids.empty())
         return;
 
@@ -374,6 +375,7 @@ void GameScene::onEnsureMove()
         }
     }
     onMapMoveFinished(this);
+#endif
 }
 
 CCPoint GameScene::pointToGrid(cocos2d::CCPoint point)
@@ -450,6 +452,7 @@ void GameScene::WalkSouth(void)
     mGrid->runAction(mt1);
     */
 
+    /*
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         pt = (*it)->getPosition();
@@ -457,6 +460,7 @@ void GameScene::WalkSouth(void)
         CCMoveTo* m = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
         (*it)->runAction(m);
     }
+    */
 }/*}}}*/
 
 void GameScene::WalkNorth(void)
@@ -476,7 +480,7 @@ void GameScene::WalkNorth(void)
     CCMoveTo* mt1 = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mGrid->runAction(mt1);
     */
-
+    /*
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         pt = (*it)->getPosition();
@@ -484,6 +488,7 @@ void GameScene::WalkNorth(void)
         CCMoveTo* m = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
         (*it)->runAction(m);
     }
+    */
 
 }/*}}}*/
 
@@ -505,6 +510,7 @@ void GameScene::WalkWest(void)
     mGrid->runAction(mt1);
     */
 
+    /*
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         pt = (*it)->getPosition();
@@ -512,7 +518,7 @@ void GameScene::WalkWest(void)
         CCMoveTo* m = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
         (*it)->runAction(m);
     }
-
+    */
 }/*}}}*/
 
 void GameScene::WalkEast(void)
@@ -533,6 +539,7 @@ void GameScene::WalkEast(void)
     mGrid->runAction(mt1);
     */
 
+    /*
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         pt = (*it)->getPosition();
@@ -540,7 +547,7 @@ void GameScene::WalkEast(void)
         CCMoveTo* m = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
         (*it)->runAction(m);
     }
-
+    */
 
 }/*}}}*/
 
@@ -563,6 +570,7 @@ void GameScene::WalkSouthEast(void)
     mGrid->runAction(mt1);
     */
 
+    /*
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         pt = (*it)->getPosition();
@@ -571,7 +579,7 @@ void GameScene::WalkSouthEast(void)
         CCMoveTo* m = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
         (*it)->runAction(m);
     }
-
+    */
 
 
 }/*}}}*/
@@ -595,6 +603,7 @@ void GameScene::WalkSouthWest(void)
     mGrid->runAction(mt1);
     */
 
+    /*
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         pt = (*it)->getPosition();
@@ -603,6 +612,7 @@ void GameScene::WalkSouthWest(void)
         CCMoveTo* m = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
         (*it)->runAction(m);
     }
+    */
 }/*}}}*/
 
 void GameScene::WalkNorthEast(void)
@@ -624,6 +634,7 @@ void GameScene::WalkNorthEast(void)
     mGrid->runAction(mt1);
     */
 
+    /*
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         pt = (*it)->getPosition();
@@ -632,6 +643,7 @@ void GameScene::WalkNorthEast(void)
         CCMoveTo* m = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
         (*it)->runAction(m);
     }
+    */
 }/*}}}*/
 
 void GameScene::WalkNorthWest(void)
@@ -653,6 +665,7 @@ void GameScene::WalkNorthWest(void)
     mGrid->runAction(mt1);
     */
 
+    /*
     std::list<cocos2d::CCSprite*>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         pt = (*it)->getPosition();
@@ -661,6 +674,7 @@ void GameScene::WalkNorthWest(void)
         CCMoveTo* m = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
         (*it)->runAction(m);
     }
+    */
 }/*}}}*/
 
 
@@ -684,10 +698,12 @@ void GameScene::onMapMoveFinished(cocos2d::CCNode* sender)
     mGameMapLayer->centerMap(ccp(mHero.x, mHero.y));
     // hero->stopAllActions();
 
+    /*
     if (!mPathGrids.empty()) {
         this->removeChild(mPathGrids.front());
         mPathGrids.pop_front();
     }
+    */
  
     if (mWalkList.size() > 0) {
         std::list<WalkFunc>::iterator it = mWalkList.begin();

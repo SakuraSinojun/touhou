@@ -54,6 +54,7 @@ GameMap::Chunk::Chunk(GameMap::ChunkId _id)
     GameMap::Node* n;
     int j, i;
     int d = sadv::dice(20, 1);
+    d = 11;
     if (d <= 10) {
         int w = 5 + sadv::dice(CHUNKWIDTH - 7, 1);
         int h = 5 + sadv::dice(CHUNKHEIGHT - 7, 1);

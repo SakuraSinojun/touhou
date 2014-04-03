@@ -6,6 +6,8 @@
 #include "AppMacros.h"
 #include "gamemap.h"
 
+#include <list>
+
 
 class MapTile;
 class GameMapLayer : public  cocos2d::CCLayer
@@ -38,6 +40,7 @@ public:
 
 
     void onClick(cocos2d::CCPoint point);
+    void onEnsureMove();
 
 private:
     void registerWithTouchDispatcher();
@@ -61,6 +64,8 @@ private:
 
     cocos2d::CCSprite*  mGrid;
     cocos2d::CCPoint    mGridPosition;
+
+    std::list<cocos2d::CCSprite*> mPathGrids;
 
 public:
     int getMapLayerWidth() { return MAPWIDTH * 32; }
