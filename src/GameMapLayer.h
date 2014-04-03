@@ -65,7 +65,15 @@ private:
     cocos2d::CCSprite*  mGrid;
     cocos2d::CCPoint    mGridPosition;
 
-    std::list<cocos2d::CCSprite*> mPathGrids;
+    class PathGrid {
+    public:
+        PathGrid() : sprite(NULL) {}
+        PathGrid(cocos2d::CCSprite* s, cocos2d::CCPoint p) : sprite(s), pt(p) {}
+        cocos2d::CCSprite*  sprite;
+        cocos2d::CCPoint    pt;
+    };
+    std::list<PathGrid> mPathGrids;
+    void removeAllPathGrids();
 
 public:
     int getMapLayerWidth() { return MAPWIDTH * 32; }

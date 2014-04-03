@@ -5,6 +5,7 @@
 #include "MapTile.h"
 #include "creature.h"
 #include "gamemap.h"
+#include "hero.h"
 #include "logging.h"
 
 USING_NS_CC;
@@ -69,9 +70,6 @@ void GameMapLayer::registerWithTouchDispatcher()
 
 void GameMapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
 {
-    // CCTouch* touch = (CCTouch*)(touches->anyObject());
-    // CCPoint pt = touch->getLocation();
-    // RUN_HERE() << "touch: (" << pt.x << ", " << pt.y << ")";
 }
 
 void GameMapLayer::onClick(cocos2d::CCPoint point)
@@ -83,13 +81,41 @@ void GameMapLayer::onClick(cocos2d::CCPoint point)
     }
     mGridPosition = pointToMap(point);
 
-    // CHelper ch;
+    removeAllPathGrids();
+    Hero* hero = Hero::getInstance();
+    CHelper ch;
+    if (findPath(ccp(hero->x, hero->y), ccp(mGridPosition.x, mGridPosition.y), ch)) {
+        std::list<CCPoint>::iterator it;
+        RUN_HERE() << "count = " << ch.nodes.size();
+        for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
+            if (it == ch.nodes.begin())
+                continue;
+
+            CCSprite* sp = CCSprite::create("GreenGrid.png");
+            PathGrid pg(sp, *it);
+            mPathGrids.push_back(pg);
+            this->addChild(sp, 12);
+        }
+    }
 
     refreshMap();
 }
 
 void GameMapLayer::onEnsureMove()
 {
+}
+
+void GameMapLayer::removeAllPathGrids()
+{
+    std::list<PathGrid>::iterator it;
+    for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
+        PathGrid& pg = *it;
+        if (pg.sprite) {
+            pg.sprite->setVisible(false);
+            this->removeChild(pg.sprite);
+        }
+    }
+    mPathGrids.clear();
 }
 
 #if 0
@@ -219,16 +245,30 @@ void GameMapLayer::refreshMap()
         }
     }
 
-    if (mGridPosition.x > sx && mGridPosition.x < sx + MAPWIDTH && mGridPosition.y > sy && mGridPosition.y < sy + MAPHEIGHT) {
-        mGrid->setVisible(true);
-        int x = mGridPosition.x - sx;
-        int y = mGridPosition.y - sy;
-        CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-        mGrid->setPosition(ccp(origin.x + (x - 1) * 32 + 16, origin.y + (y - 1) * 32 + 16));
+    if (mPathGrids.empty()) {
+        if (mGridPosition.x > sx && mGridPosition.x < sx + MAPWIDTH && mGridPosition.y > sy && mGridPosition.y < sy + MAPHEIGHT) {
+            mGrid->setVisible(true);
+            int x = mGridPosition.x - sx;
+            int y = mGridPosition.y - sy;
+            CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+            mGrid->setPosition(ccp(origin.x + (x - 1) * 32 + 16, origin.y + (y - 1) * 32 + 16));
+        } else {
+            mGrid->setVisible(false);
+        }
     } else {
         mGrid->setVisible(false);
-    }
+        std::list<PathGrid>::iterator it;
+        for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
+            PathGrid& pg = *it;
+            if (pg.sprite) {
+                int x = pg.pt.x - sx;
+                int y = pg.pt.y - sy;
 
+                pg.sprite->setVisible(true);
+                pg.sprite->setPosition(ccp(origin.x + (x - 1) * 32 + 16, origin.y + (y - 1) * 32 + 16));
+            }
+        }
+    }
 
 }/*}}}*/
 

@@ -100,48 +100,25 @@ bool GameScene::init()
         return false;
     }
 
-    static int g_tag = 1000;
-
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
     
-    // bg = CCTMXTiledMap::create("test.tmx");
-    // this->addChild(bg, 0);
-
     mGameMapLayer = GameMapLayer::create();
     this->addChild(mGameMapLayer, 0);
 
+    // Hero
     CCRect  rect(0, 0, 64, 64);
-    CCSprite* s = CCSprite::create("hero.png", rect);
-    s->setTag(g_tag++);
-    // s->initWithFile("hero.png", rect);
+    CCSprite* s = Hero::getInstance()->createSprite("hero.png", rect);
     CCPoint anchor = s->getAnchorPoint();
-    RUN_HERE() << "anchor = (" << anchor.x << ", " << anchor.y << ")";
     anchor.y -= 16.0f / 64.0f;
     s->setAnchorPoint(anchor);
-    mHero.Attach(s);
-    mGameMapLayer->gamemap().at(mHero.x, mHero.y)->creature = &mHero;
 
-    mGameMapLayer->centerMap(ccp(mHero.x, mHero.y));
-    /*
-    hero = CCSprite::create("hero.png", rect);
-    CCPoint pt = ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2);
-    pt = pointToGrid(pt);
-    pt = gridToPoint(pt);
-    pt.y += 16;
-
-    hero->setPosition(pt);
-    this->addChild(hero, 10);
-    */
-
-    /*
-
-    mGrid = CCSprite::create("RedGrid.png");
-    mGrid->setPosition(ccp(0, 0));
-    mGrid->setVisible(false);
-    this->addChild(mGrid, 11);
-    */
+    // Map
+    mGameMapLayer->gamemap().at(0, 0)->creature = Hero::getInstance();
+    mGameMapLayer->centerMap(ccp(0, 0));
    
+
+    // DEBUG Message
     pDebug = CCLabelTTF::create("DEBUG", "Marker Felt", 32);
     pDebug->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
     pDebug->setVisible(false);
@@ -239,7 +216,6 @@ void GameScene::singleTouchDragging(CCPoint startPoint, CCPoint now)
 
     // CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-    // RUN_HERE() << "width = " << mGameMap->getContentSize().width;
 
     CCPoint center = mGameMapLayer->getMapCenter();
     if (n.x > origin.x + 32) {
@@ -264,16 +240,6 @@ void GameScene::singleTouchDragging(CCPoint startPoint, CCPoint now)
     }
     mGameMapLayer->setPosition(n);
 }
-
-class CHelper {
-public:
-    void operator() (int x, int y) {
-        // RUN_HERE() << "x = " << x << " y = " << y;
-        CCPoint pt(x, y);
-        nodes.push_back(pt);
-    }
-    std::list<CCPoint> nodes;
-};
 
 void GameScene::onClick(cocos2d::CCPoint point)
 {
@@ -378,6 +344,7 @@ void GameScene::onEnsureMove()
 #endif
 }
 
+#if 0
 CCPoint GameScene::pointToGrid(cocos2d::CCPoint point)
 {
     CCPoint pt;
@@ -677,6 +644,7 @@ void GameScene::WalkNorthWest(void)
     */
 }/*}}}*/
 
+#endif
 
 void GameScene::showGrid(cocos2d::CCPoint grid)
 {
@@ -694,6 +662,7 @@ void GameScene::hideGrid()
 
 void GameScene::onMapMoveFinished(cocos2d::CCNode* sender)
 {
+#if 0
     mGameMapLayer->setPosition(ccp(0, 0));
     mGameMapLayer->centerMap(ccp(mHero.x, mHero.y));
     // hero->stopAllActions();
@@ -713,6 +682,7 @@ void GameScene::onMapMoveFinished(cocos2d::CCNode* sender)
     } else {
         bMoving = false;
     }
+#endif
 }
 
 

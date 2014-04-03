@@ -51,8 +51,6 @@ private:
 
     // cocos2d::CCSprite*  mGrid;
 
-    Hero                mHero;
-
     bool bMoving;
 
 private:
@@ -73,6 +71,7 @@ private:
     void onClick(cocos2d::CCPoint point);
     void onEnsureMove();
 
+#if 0
     void WalkSouth(void);
     void WalkNorth(void);
     void WalkWest(void);
@@ -84,13 +83,13 @@ private:
     void WalkNorthWest(void);
 
 
-    void moveHero(cocos2d::CCPoint point);
-
     cocos2d::CCPoint pointToGrid(cocos2d::CCPoint point);
     cocos2d::CCRect  gridToRect(cocos2d::CCPoint grid);
     cocos2d::CCPoint gridToPoint(cocos2d::CCPoint grid);
     cocos2d::CCPoint gridToMap(cocos2d::CCPoint grid);
     cocos2d::CCPoint mapToGrid(cocos2d::CCPoint pMap);
+
+#endif
 
     void showGrid(cocos2d::CCPoint grid);
     void hideGrid();
