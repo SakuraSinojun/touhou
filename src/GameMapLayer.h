@@ -38,7 +38,6 @@ public:
 
     GameMap& gamemap() { return mGameMap; }
 
-
     void onClick(cocos2d::CCPoint point);
     void onEnsureMove();
 
@@ -75,6 +74,31 @@ private:
     std::list<PathGrid> mPathGrids;
     void removeAllPathGrids();
 
+private:
+    class Direction {
+    public:
+        Direction() : dx(0), dy(0) {}
+        Direction(int x, int y) : dx(x), dy(y) {}
+        int x() {
+            if (dx < 0) return -1;
+            else if (dx > 0) return 1;
+            else return 0; 
+        }
+        int y() {
+            if (dy < 0) return -1;
+            else if (dy > 0) return 1;
+            else return 0; 
+        }
+
+    private:
+        int dx;
+        int dy;
+    };
+
+    void Walk(Direction direction);
+    void onMoveFinished(cocos2d::CCObject* pSender);
+
+    std::list<Direction>    mDirections;
 public:
     int getMapLayerWidth() { return MAPWIDTH * 32; }
     int getMapLayerHeight() { return MAPHEIGHT * 32; }

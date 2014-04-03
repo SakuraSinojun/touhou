@@ -71,31 +71,6 @@ private:
     void onClick(cocos2d::CCPoint point);
     void onEnsureMove();
 
-#if 0
-    void WalkSouth(void);
-    void WalkNorth(void);
-    void WalkWest(void);
-    void WalkEast(void);
-
-    void WalkSouthEast(void);
-    void WalkSouthWest(void);
-    void WalkNorthEast(void);
-    void WalkNorthWest(void);
-
-
-    cocos2d::CCPoint pointToGrid(cocos2d::CCPoint point);
-    cocos2d::CCRect  gridToRect(cocos2d::CCPoint grid);
-    cocos2d::CCPoint gridToPoint(cocos2d::CCPoint grid);
-    cocos2d::CCPoint gridToMap(cocos2d::CCPoint grid);
-    cocos2d::CCPoint mapToGrid(cocos2d::CCPoint pMap);
-
-#endif
-
-    void showGrid(cocos2d::CCPoint grid);
-    void hideGrid();
-
-    void onMapMoveFinished(cocos2d::CCNode* sender);
-
 private:
 
     typedef void (GameScene::*WalkFunc)(void);
