@@ -7,6 +7,7 @@
 #include <list>
 #include <math.h>
 #include <vector>
+#include "mapgenerator.h"
 #include "logging.h"
 
 
@@ -99,33 +100,7 @@ GameMap::Chunk::Chunk(GameMap::ChunkId _id, GameMap* gm)
     , flag(0)
     , mGameMap(gm)
 {
-#if 0
-    // {{{
-    int dc = 0;
-    if (_id.x == 0 && _id.y == 0) {
-        RUN_HERE();
-        flag = 1;
-    } else {
-        Chunk* c = upper();
-        if (c && c->flag && !c->hasConnectedNeighbours())
-            dc++;
-        c = under();
-        if (c && c->flag && !c->hasConnectedNeighbours())
-            dc++;
-        c = left();
-        if (c && c->flag && !c->hasConnectedNeighbours())
-            dc++;
-        c = right();
-        if (c && c->flag && !c->hasConnectedNeighbours())
-            dc++;
-    }
-    if (flag == 0) {
-        int d = sadv::dice(6);
-        if (d <= dc) {
-            flag = 1;
-        }
-    }
-
+#if 1
     int x = CHUNKWIDTH * id.x;
     int y = CHUNKHEIGHT * id.y;
 
@@ -135,19 +110,11 @@ GameMap::Chunk::Chunk(GameMap::ChunkId _id, GameMap* gm)
             nodes[j][i].x = x + i;
             nodes[j][i].y = y + j;
             Node* n = &nodes[j][i];
-            if (flag) {
-                n->type = NODE_GRASS;
-                n->blocksight = false;
-                n->canpass = true;
-            } else {
-                n->type = NODE_TREE;
-                n->blocksight = false;
-                n->canpass = false;
-            }
+            n->type = NODE_TREE;
+            n->blocksight = false;
+            n->canpass = false;
         }
     }
-
-    // }}}
 #else
     // {{{
     GameMap::Node* n;
@@ -264,6 +231,9 @@ GameMap::Chunk* GameMap::findChunk(ChunkId id)
 
 GameMap::Chunk* GameMap::genChunk(GameMap::ChunkId id)
 {
+    if (isChunkGenerated(id))
+        return findChunk(id);
+
     Chunk* c = new Chunk(id, this);
     if (c) {
         chunks[id] = c;
@@ -273,6 +243,7 @@ GameMap::Chunk* GameMap::genChunk(GameMap::ChunkId id)
 
 void GameMap::genChunks()
 {
+    /*
     const int GENATONCE = 3;
     // const int GENRANGE = 5;
     ChunkId id = getCurrentChunkId();
@@ -288,6 +259,8 @@ void GameMap::genChunks()
             }
         }
     }
+    */
+    mGenerator->GenMapsNearChunk(getCurrentChunkId());
 }
 
 GameMap::ChunkId GameMap::getCurrentChunkId()
@@ -301,6 +274,7 @@ GameMap::GameMap()
     : centerX(0)
     , centerY(0)
 {
+    mGenerator = new MapGenerator(this);
 }
 
 GameMap::~GameMap()

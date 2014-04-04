@@ -17,6 +17,7 @@ SOURCES = 	main.cpp \
         	StatusLayer.cpp \
         	creature.cpp \
         	hero.cpp \
+        	mapgenerator.cpp \
 
 COCOS_ROOT = /home/kazuki/projects/kazuki/third_party/cocos2d-x-2.2.2
 include $(COCOS_ROOT)/cocos2dx/proj.linux/cocos2dx.mk

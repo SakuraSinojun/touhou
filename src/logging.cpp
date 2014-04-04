@@ -59,8 +59,12 @@ LogMessage::~LogMessage()
 {
 
     std::ostringstream   oss;
-    oss << "[" << GETTID() << "] ";
 
+#ifdef LOGTID
+    oss << "[" << GETTID() << "] ";
+#endif
+
+#ifdef LOGTIME
     // time_t  t = time(NULL);
     struct tm local_time;
     struct timeval tv;
@@ -78,6 +82,7 @@ LogMessage::~LogMessage()
         << ':'
         << std::setw(6) << tv.tv_usec
         << "] ";
+#endif
 
     if (!file_.empty()) {
         size_t  pos = file_.find_last_of("/\\");

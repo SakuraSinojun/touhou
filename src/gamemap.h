@@ -10,7 +10,7 @@
 #define CHUNKHEIGHT CHUNKWIDTH
 
 
-
+class MapGenerator;
 class Creature;
 class GameMap
 {
@@ -25,7 +25,16 @@ public:
 
     class Node {
     public:
-        Node() : type(NODE_GRASS), blocksight(false), canpass(true), x(0), y(0), creature(NULL) {}
+        Node()
+            : type(NODE_GRASS)
+            , blocksight(false)
+            , canpass(true)
+            , x(0)
+            , y(0)
+            , creature(NULL)
+            , isWall(true)
+            , hasConsidered(false)
+        {}
         ~Node() {}
         NODETYPE type;
         bool blocksight;
@@ -33,7 +42,8 @@ public:
         int x;
         int y;
         Creature* creature;
-
+        bool isWall;
+        bool hasConsidered;
     };
 
     class ChunkId {
@@ -77,6 +87,12 @@ public:
         }
         int getChunkStartY() {
             return CHUNKHEIGHT * y;
+        }
+        int getChunkCenterX() {
+            return CHUNKWIDTH * x + CHUNKWIDTH / 2;
+        }
+        int getChunkCenterY() {
+            return CHUNKHEIGHT * y + CHUNKHEIGHT / 2;
         }
         int x;
         int y;
@@ -127,6 +143,8 @@ private:
 
     bool isChunkGenerated(int x, int y);
     bool isChunkGenerated(ChunkId id);
+
+    MapGenerator*  mGenerator;
 
 public:
     int centerX, centerY;
