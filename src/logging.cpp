@@ -121,4 +121,11 @@ std::ostream& operator<<(std::ostream& o, cocos2d::CCPoint& pt)
     return o;
 }
 
+std::ostream& operator<<(std::ostream& o, cocos2d::CCSize& sz)
+{
+    o << "(" << sz.width << ", " << sz.height << ")";
+    return o;
+}
+
+
 

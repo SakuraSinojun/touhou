@@ -11,7 +11,7 @@
 
 USING_NS_CC;
 
-#define MAPMOVETIMEPERGRID 0.15f
+#define MAPMOVETIMEPERGRID 0.3f
 
 
 bool TileMapWrapper::init()
@@ -62,6 +62,11 @@ void TileMapWrapper::refreshMap()
     int sx = l->mGameMap.centerX - MAPWIDTH / 2;
     int sy = l->mGameMap.centerY - MAPHEIGHT / 2;
 
+    int nx = MAPWIDTH - (DESIGNWIDTH / 32);
+    int ny = MAPHEIGHT - (DESIGNHEIGHT / 32);
+    nx /= 2;
+    ny /= 2;
+
     // this->removeAllChildren();
 
     CCObject* node = NULL;
@@ -85,13 +90,13 @@ void TileMapWrapper::refreshMap()
                 tiles[i][j] = MapTile::create();
                 this->addChild(tiles[i][j], 0);
             }
-            tiles[i][j]->setPosition(ccp(origin.x + (i - 1) * 32 + 16, origin.y + (j - 1) * 32 + 16));
+            tiles[i][j]->setPosition(ccp(origin.x + (i - nx) * 32 + 16, origin.y + (j - nx) * 32 + 16));
             tiles[i][j]->setType(n->type);
             tiles[i][j]->setVisible(true);
             if (n->creature) {
                 CCSprite * s = n->creature->getSprite();
                 if (s) {
-                    s->setPosition(ccp(origin.x + (i - 1) * 32 + 16, origin.y + (j - 1) * 32 + 16));
+                    s->setPosition(ccp(origin.x + (i - ny) * 32 + 16, origin.y + (j - ny) * 32 + 16));
                     if (this->getChildByTag(s->getTag()) == NULL) {
                         this->addChild(s, 10); // , s->getTag());
                     }
@@ -106,7 +111,7 @@ void TileMapWrapper::refreshMap()
             int x = mGridPosition.x - sx;
             int y = mGridPosition.y - sy;
             CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-            mGrid->setPosition(ccp(origin.x + (x - 1) * 32 + 16, origin.y + (y - 1) * 32 + 16));
+            mGrid->setPosition(ccp(origin.x + (x - nx) * 32 + 16, origin.y + (y - ny) * 32 + 16));
         }
     } else {
         std::list<PathGrid>::iterator it;
@@ -117,7 +122,7 @@ void TileMapWrapper::refreshMap()
                 int y = pg.pt.y - sy;
 
                 pg.sprite->setVisible(true);
-                pg.sprite->setPosition(ccp(origin.x + (x - 1) * 32 + 16, origin.y + (y - 1) * 32 + 16));
+                pg.sprite->setPosition(ccp(origin.x + (x - nx) * 32 + 16, origin.y + (y - ny) * 32 + 16));
             }
         }
     }

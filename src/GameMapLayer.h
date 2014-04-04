@@ -9,8 +9,8 @@
 #include <list>
 
 
-#define MAPWIDTH    ((DESIGNWIDTH / 32) + 2)
-#define MAPHEIGHT   ((DESIGNHEIGHT / 32) + 2)
+#define MAPWIDTH    ((DESIGNWIDTH / 32) + 4)
+#define MAPHEIGHT   ((DESIGNHEIGHT / 32) + 4)
 
 
 class MapTile;
