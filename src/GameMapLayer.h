@@ -9,13 +9,45 @@
 #include <list>
 
 
+#define MAPWIDTH    ((DESIGNWIDTH / 32) + 2)
+#define MAPHEIGHT   ((DESIGNHEIGHT / 32) + 2)
+
+
 class MapTile;
+class TileMapWrapper : public cocos2d::CCLayer
+{
+public:
+    CREATE_FUNC(TileMapWrapper);
+    virtual bool init();
+    void refreshMap();
+
+public:
+    cocos2d::CCSprite*  mGrid;
+    cocos2d::CCPoint    mGridPosition;
+
+    class PathGrid {
+    public:
+        PathGrid() : sprite(NULL) {}
+        PathGrid(cocos2d::CCSprite* s, cocos2d::CCPoint p) : sprite(s), pt(p) {}
+        cocos2d::CCSprite*  sprite;
+        cocos2d::CCPoint    pt;
+    };
+    std::list<PathGrid> mPathGrids;
+    void removeAllPathGrids();
+
+
+private:
+    MapTile* tiles[MAPWIDTH][MAPHEIGHT];
+};
+
 class GameMapLayer : public  cocos2d::CCLayer
 {
 public:
     CREATE_FUNC(GameMapLayer)
     virtual bool init();
 
+
+    static GameMapLayer* getInstance();
 
     void centerMap(cocos2d::CCPoint point);
     cocos2d::CCPoint getMapCenter();
@@ -41,40 +73,16 @@ public:
     void onClick(cocos2d::CCPoint point);
     void onEnsureMove();
 
+    GameMap             mGameMap;
 private:
     void registerWithTouchDispatcher();
     void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
 
     cocos2d::CCPoint pointToMap(cocos2d::CCPoint point);
-    cocos2d::CCRect  gridToRect(cocos2d::CCPoint grid);
-    cocos2d::CCPoint gridToPoint(cocos2d::CCPoint grid);
-    cocos2d::CCPoint gridToMap(cocos2d::CCPoint grid);
-    cocos2d::CCPoint mapToGrid(cocos2d::CCPoint pMap);
-
-
-#define MAPWIDTH    ((DESIGNWIDTH / 32) + 2)
-#define MAPHEIGHT   ((DESIGNHEIGHT / 32) + 2)
-
-    MapTile* tiles[MAPWIDTH][MAPHEIGHT];
-
-    void refreshMap();
-
-    GameMap             mGameMap;
-
-    cocos2d::CCSprite*  mGrid;
-    cocos2d::CCPoint    mGridPosition;
-
-    class PathGrid {
-    public:
-        PathGrid() : sprite(NULL) {}
-        PathGrid(cocos2d::CCSprite* s, cocos2d::CCPoint p) : sprite(s), pt(p) {}
-        cocos2d::CCSprite*  sprite;
-        cocos2d::CCPoint    pt;
-    };
-    std::list<PathGrid> mPathGrids;
-    void removeAllPathGrids();
 
 private:
+    TileMapWrapper * tmw;
+
     class Direction {
     public:
         Direction() : dx(0), dy(0) {}

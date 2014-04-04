@@ -13,25 +13,11 @@ USING_NS_CC;
 
 #define MAPMOVETIMEPERGRID 0.15f
 
-class CHelper {
-public:
-    void operator() (int x, int y) {
-        CCPoint pt(x, y);
-        nodes.push_back(pt);
-    }
-    std::list<CCPoint> nodes;
-};
 
-
-bool GameMapLayer::init()
+bool TileMapWrapper::init()
 {/*{{{*/
-    if (!CCLayer::init()) {
+    if (!CCLayer::init())
         return false;
-    }
-
-    // CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
-    // CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-
     int i, j;
     for (i=0; i<MAPWIDTH; i++) {
         for (j=0; j<MAPHEIGHT; j++) {
@@ -43,161 +29,20 @@ bool GameMapLayer::init()
     mGrid->setPosition(ccp(0, 0));
     mGrid->setVisible(false);
     this->addChild(mGrid, 11);
- 
+
     mGridPosition.x = -100;
     mGridPosition.y = -100;
 
     // this->setTouchEnabled(true);
     // CCDirector::sharedDirector()->getKeypadDispatcher()->addDelegate(this);
 
-
     refreshMap();
+
     return true;
 }/*}}}*/
 
-void GameMapLayer::centerMap(cocos2d::CCPoint point)
-{
-    mGameMap.centerMap(point.x, point.y);
-    refreshMap();
-}
-
-cocos2d::CCPoint GameMapLayer::getMapCenter()
-{
-    return ccp(mGameMap.centerX, mGameMap.centerY);
-}
-
-void GameMapLayer::registerWithTouchDispatcher()
-{
-    CCDirector::sharedDirector()->getTouchDispatcher()->addStandardDelegate(this, 0);
-}
-
-void GameMapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
-{
-}
-
-void GameMapLayer::onClick(cocos2d::CCPoint point)
-{
-    CCPoint pt = pointToMap(point);
-    if (pt.x == mGridPosition.x && pt.y == mGridPosition.y) {
-        onEnsureMove();
-        return;
-    }
-    mGridPosition = pointToMap(point);
-
-    removeAllPathGrids();
-    Hero* hero = Hero::getInstance();
-    CHelper ch;
-    if (findPath(ccp(hero->x, hero->y), ccp(mGridPosition.x, mGridPosition.y), ch)) {
-        mGrid->setVisible(false);
-        std::list<CCPoint>::iterator it;
-        // RUN_HERE() << "count = " << ch.nodes.size();
-        for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
-            if (it == ch.nodes.begin())
-                continue;
-
-            CCSprite* sp = CCSprite::create("GreenGrid.png");
-            PathGrid pg(sp, *it);
-            mPathGrids.push_back(pg);
-            this->addChild(sp, 12);
-        }
-    } else {
-        mGrid->setVisible(true);
-    }
-
-    refreshMap();
-}
-
-void GameMapLayer::onEnsureMove()
-{
-    Hero* hero = Hero::getInstance();
-    CCPoint last(hero->x, hero->y);
-    std::list<PathGrid>::iterator it;
-    for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
-        CCPoint dp = ccpSub((*it).pt, last);
-        last = (*it).pt;
-        Direction d(dp.x, dp.y);
-        mDirections.push_back(d);
-    }
-
-    GameScene* scene = (GameScene*)this->getParent();
-    scene->setTouchEnabled(false);
-
-    onMoveFinished(this);
-}
-
-void GameMapLayer::Walk(Direction direction)
-{
-    CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage("hero.png");
-    float w = texture->getContentSize().width / 4.0f;
-    float h = texture->getContentSize().height / 4.0f;
-    CCAnimation* animation = CCAnimation::create();
-    for (int i = 0; i < 2; i++) {
-        animation->addSpriteFrameWithTexture(texture, CCRectMake(i * w, 0, w, h));
-    }
-    animation->setDelayPerUnit(MAPMOVETIMEPERGRID / 2.0f);
-    CCAnimate* animate = CCAnimate::create(animation);
-    Hero::getInstance()->getSprite()->runAction(CCRepeatForever::create(animate));
-
-    Hero* hero = Hero::getInstance();
-    hero->move(direction.x(), direction.y(), &mGameMap);
-
-    int i, j;
-    for (i=0; i<MAPWIDTH; i++) {
-        for (j=0; j<MAPHEIGHT; j++) {
-            CCPoint pt = tiles[i][j]->getPosition();
-            pt.x -= direction.x() * 32;
-            pt.y -= direction.y() * 32;
-            CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
-            if (i == MAPWIDTH - 1 && j == MAPHEIGHT - 1) {
-                CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameMapLayer::onMoveFinished));
-                tiles[i][j]->runAction(CCSequence::create(mt, cf, NULL));
-            } else {
-                tiles[i][j]->runAction(mt);
-            }
-        }
-    }
-
-    std::list<PathGrid>::iterator it;
-    for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
-        PathGrid& pg = *it;
-        if (pg.sprite) {
-            CCPoint pt = pg.sprite->getPosition();
-            pt.x -= direction.x() * 32;
-            pt.y -= direction.y() * 32;
-            CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
-            pg.sprite->runAction(mt);
-        }
-    }
-
-}
-
-void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
-{
-    // RUN_HERE();
-    Hero::getInstance()->getSprite()->stopAllActions();
-
-    if (!mPathGrids.empty()) {
-        PathGrid& pg = mPathGrids.front();
-        this->removeChild(pg.sprite);
-        mPathGrids.pop_front();
-    }
-
-    Hero* hero = Hero::getInstance();
-    centerMap(ccp(hero->x, hero->y));
-
-    // go on.
-    if (mDirections.empty()) {
-        GameScene* scene = (GameScene*)this->getParent();
-        scene->setTouchEnabled(true);
-    } else {
-        Direction d = mDirections.front();
-        mDirections.pop_front();
-        Walk(d);
-    }
-}
-
-void GameMapLayer::removeAllPathGrids()
-{
+void TileMapWrapper::removeAllPathGrids()
+{/*{{{*/
     std::list<PathGrid>::iterator it;
     for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
         PathGrid& pg = *it;
@@ -207,95 +52,15 @@ void GameMapLayer::removeAllPathGrids()
         }
     }
     mPathGrids.clear();
-}
-
-#if 0
-cocos2d::CCRect GameScene::gridToRect(cocos2d::CCPoint grid)
-{
-    CCRect  rect;
-    rect.origin = ccp(grid.x * 32, grid.y * 32);
-    rect.size = CCSizeMake(32, 32);
-    return rect;
-}
-
-cocos2d::CCPoint GameScene::gridToPoint(cocos2d::CCPoint grid)
-{
-    CCPoint pt;
-    pt.x = grid.x * 32 + 16;
-    pt.y = grid.y * 32 + 16;
-    return pt;
-}
-
-cocos2d::CCPoint GameScene::gridToMap(cocos2d::CCPoint grid)
-{
-    // mx = gx - x0 + hx
-    int heroX = (MAPWIDTH - 2) / 2;
-    int heroY = (MAPHEIGHT - 2) / 2;
-    CCPoint pt = ccpSub(grid, ccp(heroX, heroY));
-    pt = ccpAdd(pt, ccp(mHero.x, mHero.y));
-    return pt;
-}
-
-cocos2d::CCPoint GameScene::mapToGrid(cocos2d::CCPoint pMap)
-{
-    // gx = mx - hx + x0
-    int heroX = (MAPWIDTH - 2) / 2;
-    int heroY = (MAPHEIGHT - 2) / 2;
-    CCPoint pt = ccpSub(pMap, ccp(mHero.x, mHero.y));
-    pt = ccpAdd(pt, ccp(heroX, heroY));
-    return pt;
-}
-#endif
-cocos2d::CCPoint GameMapLayer::pointToMap(cocos2d::CCPoint point)
-{
-    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
-    CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-
-    CCPoint center;
-    center.x = origin.x + visibleSize.width / 2;
-    center.y = origin.y + visibleSize.height / 2;
-
-    CCPoint dd;
-    dd.x = (MAPWIDTH % 2) / 2.0f;
-    dd.y = (MAPHEIGHT % 2) / 2.0f;
-
-    CCPoint dp;
-    dp.x = floor((point.x - center.x) / 32.0f + dd.x);
-    dp.y = floor((point.y - center.y) / 32.0f + dd.y);
+}/*}}}*/
 
 
-    CCPoint pt;
-    pt.x = mGameMap.centerX + dp.x;
-    pt.y = mGameMap.centerY + dp.y;
-
-    return pt;
-}
-
-cocos2d::CCRect GameMapLayer::gridToRect(cocos2d::CCPoint grid)
-{
-    return CCRectMake(0, 0, 0, 0);
-}
-
-cocos2d::CCPoint GameMapLayer::gridToPoint(cocos2d::CCPoint grid)
-{
-    return ccp(0, 0);
-}
-
-cocos2d::CCPoint GameMapLayer::gridToMap(cocos2d::CCPoint grid)
-{
-    return ccp(0, 0);
-}
-
-cocos2d::CCPoint GameMapLayer::mapToGrid(cocos2d::CCPoint pMap)
-{
-    return ccp(0, 0);
-}
-
-void GameMapLayer::refreshMap()
+void TileMapWrapper::refreshMap()
 {/*{{{*/
+    GameMapLayer* l = GameMapLayer::getInstance();
     int i, j;
-    int sx = mGameMap.centerX - MAPWIDTH / 2;
-    int sy = mGameMap.centerY - MAPHEIGHT / 2;
+    int sx = l->mGameMap.centerX - MAPWIDTH / 2;
+    int sy = l->mGameMap.centerY - MAPHEIGHT / 2;
 
     // this->removeAllChildren();
 
@@ -314,7 +79,7 @@ void GameMapLayer::refreshMap()
         for (j=0; j<MAPHEIGHT; j++) {
             int x = sx + i;
             int y = sy + j;
-            GameMap::Node* n = mGameMap.at(x, y);
+            GameMap::Node* n = l->mGameMap.at(x, y);
 
             if (!tiles[i][j]) {
                 tiles[i][j] = MapTile::create();
@@ -356,7 +121,204 @@ void GameMapLayer::refreshMap()
             }
         }
     }
-
 }/*}}}*/
+
+class CHelper {
+public:
+    void operator() (int x, int y) {
+        CCPoint pt(x, y);
+        nodes.push_back(pt);
+    }
+    std::list<CCPoint> nodes;
+};
+
+
+static GameMapLayer* g_gamemaplayer = NULL;
+
+GameMapLayer* GameMapLayer::getInstance()
+{
+    return g_gamemaplayer;
+}
+
+bool GameMapLayer::init()
+{/*{{{*/
+    if (!CCLayer::init()) {
+        return false;
+    }
+    g_gamemaplayer = this;
+
+    tmw = TileMapWrapper::create();
+    this->addChild(tmw);
+    return true;
+}/*}}}*/
+
+void GameMapLayer::centerMap(cocos2d::CCPoint point)
+{
+    mGameMap.centerMap(point.x, point.y);
+    tmw->refreshMap();
+}
+
+cocos2d::CCPoint GameMapLayer::getMapCenter()
+{
+    return ccp(mGameMap.centerX, mGameMap.centerY);
+}
+
+void GameMapLayer::registerWithTouchDispatcher()
+{
+    CCDirector::sharedDirector()->getTouchDispatcher()->addStandardDelegate(this, 0);
+}
+
+void GameMapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
+{
+}
+
+void GameMapLayer::onClick(cocos2d::CCPoint point)
+{/*{{{*/
+    CCPoint pt = pointToMap(point);
+    if (pt.x == tmw->mGridPosition.x && pt.y == tmw->mGridPosition.y) {
+        onEnsureMove();
+        return;
+    }
+    tmw->mGridPosition = pointToMap(point);
+
+    tmw->removeAllPathGrids();
+    Hero* hero = Hero::getInstance();
+    CHelper ch;
+    if (findPath(ccp(hero->x, hero->y), ccp(tmw->mGridPosition.x, tmw->mGridPosition.y), ch)) {
+        tmw->mGrid->setVisible(false);
+        std::list<CCPoint>::iterator it;
+        // RUN_HERE() << "count = " << ch.nodes.size();
+        for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
+            if (it == ch.nodes.begin())
+                continue;
+
+            CCSprite* sp = CCSprite::create("GreenGrid.png");
+            TileMapWrapper::PathGrid pg(sp, *it);
+            tmw->mPathGrids.push_back(pg);
+            tmw->addChild(sp, 12);
+        }
+    } else {
+        tmw->mGrid->setVisible(true);
+    }
+
+    tmw->refreshMap();
+}/*}}}*/
+
+void GameMapLayer::onEnsureMove()
+{/*{{{*/
+    Hero* hero = Hero::getInstance();
+    CCPoint last(hero->x, hero->y);
+    std::list<TileMapWrapper::PathGrid>::iterator it;
+    for (it = tmw->mPathGrids.begin(); it != tmw->mPathGrids.end(); it++) {
+        CCPoint dp = ccpSub((*it).pt, last);
+        last = (*it).pt;
+        Direction d(dp.x, dp.y);
+        mDirections.push_back(d);
+    }
+
+    GameScene* scene = (GameScene*)this->getParent();
+    scene->setTouchEnabled(false);
+
+    onMoveFinished(this);
+}/*}}}*/
+
+void GameMapLayer::Walk(Direction direction)
+{
+    Hero* hero = Hero::getInstance();
+
+    CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage("hero.png");
+    float w = texture->getContentSize().width / 4.0f;
+    float h = texture->getContentSize().height / 4.0f;
+    CCAnimation* animation = CCAnimation::create();
+    for (int i = 0; i < 2; i++) {
+        animation->addSpriteFrameWithTexture(texture, CCRectMake(i * w, 0, w, h));
+    }
+    animation->setDelayPerUnit(MAPMOVETIMEPERGRID / 2.0f);
+    CCAnimate* animate = CCAnimate::create(animation);
+    hero->getSprite()->runAction(CCRepeatForever::create(animate));
+
+    CCPoint pt = hero->getSprite()->getPosition();
+    pt.x += direction.x() * 32;
+    pt.y += direction.y() * 32;
+    CCMoveTo* hmt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
+    hero->getSprite()->runAction(hmt);
+
+
+    hero->move(direction.x(), direction.y(), &mGameMap);
+
+    pt = tmw->getPosition();
+    pt.x -= direction.x() * 32;
+    pt.y -= direction.y() * 32;
+    CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
+    CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameMapLayer::onMoveFinished));
+    tmw->runAction(CCSequence::create(mt, cf, NULL));
+
+    /*
+    std::list<PathGrid>::iterator it;
+    for (it = mPathGrids.begin(); it != mPathGrids.end(); it++) {
+        PathGrid& pg = *it;
+        if (pg.sprite) {
+            CCPoint pt = pg.sprite->getPosition();
+            pt.x -= direction.x() * 32;
+            pt.y -= direction.y() * 32;
+            CCMoveTo* mt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
+            pg.sprite->runAction(mt);
+        }
+    }
+    */
+
+}
+
+void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
+{
+    // RUN_HERE();
+    Hero::getInstance()->getSprite()->stopAllActions();
+
+    if (!tmw->mPathGrids.empty()) {
+        TileMapWrapper::PathGrid& pg = tmw->mPathGrids.front();
+        tmw->removeChild(pg.sprite);
+        tmw->mPathGrids.pop_front();
+    }
+
+    tmw->setPosition(ccp(0, 0));
+
+    Hero* hero = Hero::getInstance();
+    centerMap(ccp(hero->x, hero->y));
+
+    // go on.
+    if (mDirections.empty()) {
+        GameScene* scene = (GameScene*)this->getParent();
+        scene->setTouchEnabled(true);
+    } else {
+        Direction d = mDirections.front();
+        mDirections.pop_front();
+        Walk(d);
+    }
+}
+
+cocos2d::CCPoint GameMapLayer::pointToMap(cocos2d::CCPoint point)
+{
+    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+
+    CCPoint center;
+    center.x = origin.x + visibleSize.width / 2;
+    center.y = origin.y + visibleSize.height / 2;
+
+    CCPoint dd;
+    dd.x = (MAPWIDTH % 2) / 2.0f;
+    dd.y = (MAPHEIGHT % 2) / 2.0f;
+
+    CCPoint dp;
+    dp.x = floor((point.x - center.x) / 32.0f + dd.x);
+    dp.y = floor((point.y - center.y) / 32.0f + dd.y);
+
+
+    CCPoint pt;
+    pt.x = mGameMap.centerX + dp.x;
+    pt.y = mGameMap.centerY + dp.y;
+
+    return pt;
+}
 
 
