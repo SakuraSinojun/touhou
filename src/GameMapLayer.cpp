@@ -11,7 +11,7 @@
 
 USING_NS_CC;
 
-#define MAPMOVETIMEPERGRID 0.3f
+#define MAPMOVETIMEPERGRID 0.15f
 
 
 bool TileMapWrapper::init()
