@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <list>
 #include <math.h>
+#include <vector>
 #include "logging.h"
 
 
@@ -47,14 +48,111 @@ public:
     int parentX, parentY;
 };
 
-
-GameMap::Chunk::Chunk(GameMap::ChunkId _id)
-    : id(_id)
+GameMap::Chunk* GameMap::Chunk::upper()
 {
+    ChunkId dd(id);
+    dd.y++;
+    return mGameMap->findChunk(dd);
+}
+
+GameMap::Chunk* GameMap::Chunk::under()
+{
+    ChunkId dd(id);
+    dd.y--;
+    return mGameMap->findChunk(dd);
+}
+
+GameMap::Chunk* GameMap::Chunk::left()
+{
+    ChunkId dd(id);
+    dd.x--;
+    return mGameMap->findChunk(dd);
+}
+
+GameMap::Chunk* GameMap::Chunk::right()
+{
+    ChunkId dd(id);
+    dd.x++;
+    return mGameMap->findChunk(dd);
+}
+
+bool GameMap::Chunk::hasConnectedNeighbours()
+{
+    Chunk* c = upper();
+    if (c && c->flag)
+        return true;
+    c = under();
+    if (c && c->flag)
+        return true;
+    c = left();
+    if (c && c->flag)
+        return true;
+    c = right();
+    if (c && c->flag)
+        return true;
+    return false;
+}
+
+
+GameMap::Chunk::Chunk(GameMap::ChunkId _id, GameMap* gm)
+    : id(_id)
+    , flag(0)
+    , mGameMap(gm)
+{
+#if 0
+    // {{{
+    int dc = 0;
+    if (_id.x == 0 && _id.y == 0) {
+        RUN_HERE();
+        flag = 1;
+    } else {
+        Chunk* c = upper();
+        if (c && c->flag && !c->hasConnectedNeighbours())
+            dc++;
+        c = under();
+        if (c && c->flag && !c->hasConnectedNeighbours())
+            dc++;
+        c = left();
+        if (c && c->flag && !c->hasConnectedNeighbours())
+            dc++;
+        c = right();
+        if (c && c->flag && !c->hasConnectedNeighbours())
+            dc++;
+    }
+    if (flag == 0) {
+        int d = sadv::dice(6);
+        if (d <= dc) {
+            flag = 1;
+        }
+    }
+
+    int x = CHUNKWIDTH * id.x;
+    int y = CHUNKHEIGHT * id.y;
+
+    // normal
+    for (int j=0; j<CHUNKHEIGHT; j++) {
+        for (int i=0; i<CHUNKWIDTH; i++) {
+            nodes[j][i].x = x + i;
+            nodes[j][i].y = y + j;
+            Node* n = &nodes[j][i];
+            if (flag) {
+                n->type = NODE_GRASS;
+                n->blocksight = false;
+                n->canpass = true;
+            } else {
+                n->type = NODE_TREE;
+                n->blocksight = false;
+                n->canpass = false;
+            }
+        }
+    }
+
+    // }}}
+#else
+    // {{{
     GameMap::Node* n;
     int j, i;
     int d = sadv::dice(20, 1);
-    // d = 11;
     if (d <= 10) {
         int w = 5 + sadv::dice(CHUNKWIDTH - 7, 1);
         int h = 5 + sadv::dice(CHUNKHEIGHT - 7, 1);
@@ -136,6 +234,8 @@ GameMap::Chunk::Chunk(GameMap::ChunkId _id)
             }
         }
     }
+    // }}}
+#endif
 }
 
 GameMap::Node* GameMap::at(int x, int y)
@@ -164,7 +264,7 @@ GameMap::Chunk* GameMap::findChunk(ChunkId id)
 
 GameMap::Chunk* GameMap::genChunk(GameMap::ChunkId id)
 {
-    Chunk* c = new Chunk(id);
+    Chunk* c = new Chunk(id, this);
     if (c) {
         chunks[id] = c;
     }

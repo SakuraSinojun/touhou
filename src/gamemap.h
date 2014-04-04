@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 
-#define CHUNKWIDTH  16 
+#define CHUNKWIDTH  16
 #define CHUNKHEIGHT CHUNKWIDTH
 
 
@@ -84,12 +84,21 @@ public:
 
     class Chunk {
     public:
-        Chunk(ChunkId _id);
+        Chunk(ChunkId _id, GameMap* gm);
         ~Chunk();
+
+        Chunk* upper();
+        Chunk* under();
+        Chunk* left();
+        Chunk* right();
+        bool hasConnectedNeighbours();
+
         ChunkId id;
         Node nodes[CHUNKHEIGHT][CHUNKWIDTH];
+        int flag;
     private:
         void MakeRandomNode();
+        GameMap* mGameMap;
     };
 
 public:
@@ -102,7 +111,6 @@ public:
     void centerMap(int x, int y);
 
     Chunk* findChunk(ChunkId id);
-
 
     class FpCallbackFunctor {
     public:

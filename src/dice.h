@@ -5,7 +5,7 @@
 
 namespace sadv {
 
-int dice(int faces, int times);
+int dice(int faces, int times = 1);
 
 int dice5d6k2();
 
