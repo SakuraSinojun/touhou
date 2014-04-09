@@ -209,8 +209,9 @@ bool MapGenerator::checkAndMakeWall(Wall& w)
         if (o.contains(w))
             return false;
         else if (o.intersects(w)) {
-            w = w - o;
-            return true;
+            // w = w - o;
+            // return true;
+            return false;
         }
     }
     return true;
