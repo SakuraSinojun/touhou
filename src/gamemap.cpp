@@ -260,7 +260,14 @@ void GameMap::genChunks()
         }
     }
     */
-    mGenerator->GenMapsNearChunk(getCurrentChunkId());
+    const int GENRANGE = 4 * CHUNKWIDTH;
+    static int lastX = 0;
+    static int lastY = 0;
+    if (abs(centerX - lastX) > GENRANGE || abs(centerY - lastY) > GENRANGE || (lastX == 0 && lastY == 0)) {
+        mGenerator->GenMapsNearChunk(getCurrentChunkId());
+        lastX = centerX;
+        lastY = centerY;
+    }
 }
 
 GameMap::ChunkId GameMap::getCurrentChunkId()

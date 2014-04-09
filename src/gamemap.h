@@ -16,7 +16,8 @@ class GameMap
 {
 public:
     typedef enum {
-        NODE_GRASS = 0,
+        NODE_NONE = 0,
+        NODE_GRASS,
         NODE_DIRT,
         NODE_TREE,
         NODE_WATER,

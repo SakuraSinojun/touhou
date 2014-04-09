@@ -24,10 +24,10 @@ void MapTile::setType(GameMap::NODETYPE type)
     else if (type == GameMap::NODE_DIRT)
         this->setTextureRect(CCRectMake(0, 32 * 4, 32, 32));
     else if (type == GameMap::NODE_TREE)
-        this->setTextureRect(CCRectMake(8 * 32, 0, 32, 32));
+        this->setTextureRect(CCRectMake(9 * 32, 0, 32, 32));
     else if (type == GameMap::NODE_WATER)
         this->setTextureRect(CCRectMake(14 * 32, 9 * 32, 32, 32));
     else 
-        this->setTextureRect(CCRectMake(0, 0, 32, 32));
+        this->setTextureRect(CCRectMake(10 * 32, 0, 32, 32));
 }
 
