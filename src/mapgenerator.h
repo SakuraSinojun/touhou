@@ -14,6 +14,8 @@ public:
     // near MapCenter;
     void GenMapsNearChunk(GameMap::ChunkId id);
 
+    GameMap::BIOME getBiome(int x, int y);
+
 private:
     void makeRoom(int x, int y, int w, int h);
     void makeDoor(int x, int y);
@@ -58,5 +60,7 @@ private:
     std::list<Wall> mWalls;
 
     bool checkAndMakeWall(Wall& w);
+
+    GameMap::BIOME getRawBiome(int x, int y);
 };
 

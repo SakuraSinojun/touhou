@@ -110,9 +110,24 @@ GameMap::Chunk::Chunk(GameMap::ChunkId _id, GameMap* gm)
             nodes[j][i].x = x + i;
             nodes[j][i].y = y + j;
             Node* n = &nodes[j][i];
-            n->type = NODE_TREE;
-            n->blocksight = false;
-            n->canpass = false;
+            BIOME b = gm->mGenerator->getBiome(x + i, y + j);
+            if (b == BIOME_FOREST) {
+                n->type = NODE_TREE;
+                n->blocksight = true;
+                n->canpass = false;
+            } else if (b == BIOME_PLANE) {
+                n->type = NODE_GRASS;
+                n->blocksight = false;
+                n->canpass = true;
+            } else if (b == BIOME_DESERT) {
+                n->type = NODE_DIRT;
+                n->blocksight = false;
+                n->canpass = false;
+            } else if (b == BIOME_OCEAN) {
+                n->type = NODE_WATER;
+                n->blocksight = false;
+                n->canpass = false;
+            }
         }
     }
 #else

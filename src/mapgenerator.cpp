@@ -13,9 +13,83 @@ USING_NS_CC;
 #define MAXROOMSIZE     20
 #define MINROOMSIZE     5 
 
+#define BIOMESIZE       10
+#define CROSSPERCENT    0.1f
+#define CROSSCHANCE     95
+
 MapGenerator::MapGenerator(GameMap* mp)
     : mGameMap(mp)
 {
+}
+
+GameMap::BIOME MapGenerator::getRawBiome(int x, int y)
+{
+    int centerx = ((x / (BIOMESIZE / 2)) / 2) * BIOMESIZE;
+    int centery = ((y / (BIOMESIZE / 2)) / 2) * BIOMESIZE;
+
+    int seed = (centerx << 16) + centery;
+    srand(seed);
+
+    int d = rand() % 100;
+    if (d <= 25) {
+        return GameMap::BIOME_FOREST;
+    } else if (d <= 50) {
+        return GameMap::BIOME_PLANE;
+    } else if (d <= 75) {
+        return GameMap::BIOME_DESERT;
+    } else {
+        return GameMap::BIOME_OCEAN;
+    }
+}
+
+GameMap::BIOME MapGenerator::getBiome(int x, int y)
+{
+    return GameMap::BIOME_FOREST;
+    int centerx = ((x / (BIOMESIZE / 2)) / 2) * BIOMESIZE;
+    int centery = ((y / (BIOMESIZE / 2)) / 2) * BIOMESIZE;
+
+    // RUN_HERE() << "x, y = " << x << ", " << y;
+    // RUN_HERE() << "center = " << centerx << ", " << centery;
+
+    int dx = abs(x - centerx);
+    int dy = abs(y - centery);
+
+    GameMap::BIOME biome = getRawBiome(x, y);
+    if (dx > BIOMESIZE / 2 || dy > BIOMESIZE / 2) {
+        GameMap::BIOME next = biome;
+
+        if (dx <= BIOMESIZE / 2)
+            dx = 0;
+        if (dy <= BIOMESIZE / 2)
+            dy = 0;
+
+        int seed = (x << 16) + y;
+        srand(seed);
+        int deflection = rand() % (dx + dy);
+        int chance = 0;
+        if (deflection < dx) {
+            if (x > centerx) {
+                next = getRawBiome(x + BIOMESIZE, y);
+            } else {
+                next = getRawBiome(x - BIOMESIZE, y);
+            }
+            chance = 100.0f - ((dx - BIOMESIZE / 2 * (1.0f - CROSSPERCENT)) / (CROSSPERCENT * BIOMESIZE)) * (100.0f - CROSSCHANCE);
+        } else {
+            if (y > centery) {
+                next = getRawBiome(x, y + 50);
+            } else {
+                next = getRawBiome(x, y - 50);
+            }
+            chance = 100.0f - ((dy - BIOMESIZE / 2 * (1.0f - CROSSPERCENT)) / (CROSSPERCENT * BIOMESIZE)) * (100.0f - CROSSCHANCE);
+        }
+        int dc = rand() % 100;
+        if (dc < chance) {
+            return biome;
+        } else {
+            return next;
+        }
+    }
+    return biome;
 }
 
 void MapGenerator::GenMapsNearChunk(GameMap::ChunkId id)

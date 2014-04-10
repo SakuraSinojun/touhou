@@ -24,6 +24,14 @@ public:
         NODE_MAX,
     } NODETYPE;
 
+    typedef enum {
+        BIOME_FOREST,
+        BIOME_PLANE,
+        BIOME_DESERT,
+        BIOME_RIVER,
+        BIOME_OCEAN,
+    } BIOME;
+
     class Node {
     public:
         Node()
@@ -35,6 +43,7 @@ public:
             , creature(NULL)
             , isWall(true)
             , hasConsidered(false)
+            , biome(BIOME_FOREST)
         {}
         ~Node() {}
         NODETYPE type;
@@ -45,6 +54,7 @@ public:
         Creature* creature;
         bool isWall;
         bool hasConsidered;
+        BIOME   biome;
     };
 
     class ChunkId {
