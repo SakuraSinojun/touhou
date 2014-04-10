@@ -367,14 +367,12 @@ bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
                     if (OpenTable.size() == 0) {
                         OpenTable.push_back(p0);
                     } else {
-                        std::list<Pt>::iterator it2 = OpenTable.begin();
-                        std::list<Pt>::iterator it = it2;
-                        it2++;
-                        while (it2 != OpenTable.end() && ((*it2).g + (*it2).h < p0.g + p0.h)) {
-                            it = it2;
-                            it2++;
+                        std::list<Pt>::iterator it = OpenTable.begin();
+                        it++;
+                        while (it != OpenTable.end() && ((*it).g + (*it).h < p0.g + p0.h)) {
+                            it++;
                         }
-                        OpenTable.insert(it2, p0);
+                        OpenTable.insert(it, p0);
                     }
                 }
             }
