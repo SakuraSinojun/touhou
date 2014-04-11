@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 
+#include "monsters/dark_ghost.h"
+
 #include "logging.h"
 
 USING_NS_CC;
@@ -19,6 +21,7 @@ USING_NS_CC;
 
 MapGenerator::MapGenerator(GameMap* mp)
     : mGameMap(mp)
+    , first_room_gened(false)
 {
 }
 
@@ -94,8 +97,9 @@ GameMap::BIOME MapGenerator::getBiome(int x, int y)
 
 void MapGenerator::GenMapsNearChunk(GameMap::ChunkId id)
 {
-    if (id.x == 0 && id.y == 0) {
+    if (id.x == 0 && id.y == 0 && !first_room_gened) {
         makeRoom(-7, -7, 14, 14);
+        first_room_gened = true;
     }
 
     int centerX = id.getChunkCenterX();
@@ -172,6 +176,17 @@ void MapGenerator::makeRoom(int x, int y, int w, int h)
             n->canpass = true;
             n->blocksight = false;
             n->isWall = false;
+
+            // monsters spawn
+            if (i != 0 || j != 0) {
+                int d = rand() % 100;
+                if (d == 5 && n->creature == NULL) {
+                    DarkGhost* dg = new DarkGhost();
+                    dg->x = i;
+                    dg->y = j;
+                    dg->MoveTo(i, j, mGameMap); 
+                }
+            }
         }
     }
 

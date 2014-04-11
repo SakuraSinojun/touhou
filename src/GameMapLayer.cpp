@@ -36,7 +36,7 @@ bool TileMapWrapper::init()
     // this->setTouchEnabled(true);
     // CCDirector::sharedDirector()->getKeypadDispatcher()->addDelegate(this);
 
-    refreshMap();
+    // refreshMap();
 
     return true;
 }/*}}}*/
@@ -105,7 +105,10 @@ void TileMapWrapper::refreshMap()
                 if (s) {
                     s->setPosition(ccp(origin.x + (i - ny) * 32 + 16, origin.y + (j - ny) * 32 + 16));
                     if (this->getChildByTag(s->getTag()) == NULL) {
-                        this->addChild(s, 10); // , s->getTag());
+                        if (s->getTag() == 1000)
+                            this->addChild(s, 11);
+                        else
+                            this->addChild(s, 10); // , s->getTag());
                     }
                     s->setVisible(true);
                 }
@@ -186,15 +189,17 @@ void GameMapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* eve
 
 void GameMapLayer::onClick(cocos2d::CCPoint point)
 {/*{{{*/
+    Hero* hero = Hero::getInstance();
+
     CCPoint pt = pointToMap(point);
     if (pt.x == tmw->mGridPosition.x && pt.y == tmw->mGridPosition.y) {
-        onEnsureMove();
+        if (pt.x != hero->x || pt.y != hero->y)
+            onEnsureMove();
         return;
     }
     tmw->mGridPosition = pointToMap(point);
 
     tmw->removeAllPathGrids();
-    Hero* hero = Hero::getInstance();
     CHelper ch;
     if (findPath(ccp(hero->x, hero->y), ccp(tmw->mGridPosition.x, tmw->mGridPosition.y), ch)) {
         tmw->mGrid->setVisible(false);
@@ -242,7 +247,7 @@ void GameMapLayer::Walk(Direction direction)
     float w = texture->getContentSize().width / 4.0f;
     float h = texture->getContentSize().height / 4.0f;
     CCAnimation* animation = CCAnimation::create();
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 4; i++) {
         animation->addSpriteFrameWithTexture(texture, CCRectMake(i * w, 0, w, h));
     }
     animation->setDelayPerUnit(MAPMOVETIMEPERGRID / 2.0f);

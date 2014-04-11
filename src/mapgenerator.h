@@ -62,5 +62,6 @@ private:
     bool checkAndMakeWall(Wall& w);
 
     GameMap::BIOME getRawBiome(int x, int y);
+    bool first_room_gened;
 };
 

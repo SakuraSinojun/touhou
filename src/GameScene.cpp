@@ -107,10 +107,10 @@ bool GameScene::init()
     this->addChild(mGameMapLayer, 0);
 
     // Hero
-    CCRect  rect(0, 0, 64, 64);
+    CCRect  rect(0, 0, 32, 48);
     CCSprite* s = Hero::getInstance()->createSprite("hero.png", rect);
     CCPoint anchor = s->getAnchorPoint();
-    anchor.y -= 16.0f / 64.0f;
+    anchor.y -= 16.0f / 48.0f;
     s->setAnchorPoint(anchor);
     Hero::getInstance()->MoveTo(0, 0, mGameMapLayer->gamemap());
 
