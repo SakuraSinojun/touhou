@@ -98,8 +98,13 @@ private:
     void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
 
     cocos2d::CCPoint pointToMap(cocos2d::CCPoint point);
+    cocos2d::CCPoint mapToPoint(cocos2d::CCPoint point);
 
-    CLICKTYPE   mClickType;
+    CLICKTYPE           mClickType;
+    cocos2d::CCParticleSystem*   mEmitter;
+    cocos2d::CCSprite*  mFireBall;
+
+    void onEmitterMoveFinished(cocos2d::CCObject* pSender);
 
 private:
     TileMapWrapper * tmw;

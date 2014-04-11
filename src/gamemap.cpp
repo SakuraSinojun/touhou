@@ -324,6 +324,7 @@ void GameMap::centerMap(int x, int y)
 
 bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
 {
+    return true;
     int dx = n->x - from->x;
     int dy = n->y - from->y;
     int ax = abs(dx);

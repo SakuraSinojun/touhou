@@ -1,13 +1,13 @@
 
 #include "creature.h"
 
-
 USING_NS_CC;
 
 static int g_tag = 1000;
 
 Creature::Creature()
     : mSprite(NULL)
+    , mHpBar(new HpBar())
     , mCurrentHP(10)
 {
 }
@@ -16,6 +16,8 @@ Creature::~Creature()
 {
     if (mSprite)
         delete mSprite;
+    if (mHpBar)
+        delete mHpBar;
 }
 
 void Creature::Attach(CCSprite* cs)
@@ -65,7 +67,23 @@ int Creature::maxHp()
 
 int Creature::attackRange()
 {
-    return 2;
+    return 1;
+}
+
+Creature& Creature::attack(Creature& o)
+{
+    o.mCurrentHP -= 3;
+    if (o.mCurrentHP <= 0)
+        o.mCurrentHP = 0;
+    o.mHpBar->setPercent((float)o.mCurrentHP / o.maxHp());
+    return *this;
+}
+
+Creature& Creature::attack(Creature* o)
+{
+    if (o)
+        attack(*o);
+    return *this;
 }
 
 

@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "gamemap.h"
 #include "logging.h"
+#include "HpBar.h"
 
 class Creature
 {
@@ -20,6 +21,9 @@ public:
     cocos2d::CCSprite* createSprite();
     cocos2d::CCSprite* createSprite(const char* file);
     cocos2d::CCSprite* createSprite(const char * file, cocos2d::CCRect& rect);
+
+    cocos2d::CCSprite* getBar() { return mHpBar->getBar(); }
+    // cocos2d::CCSprite* getHpBar() { return mHpBar; }
 
 public:
     // moving
@@ -50,8 +54,12 @@ public:
     virtual int maxHp();
     virtual int attackRange();
 
+    virtual Creature& attack(Creature& o);
+    virtual Creature& attack(Creature* o);
+
 protected:
-    cocos2d::CCSprite* mSprite;
+    cocos2d::CCSprite*  mSprite;
+    HpBar*              mHpBar;
 
     int mCurrentHP;
 };

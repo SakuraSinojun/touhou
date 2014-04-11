@@ -58,6 +58,8 @@ void TileMapWrapper::removeAllPathGrids()
 
 void TileMapWrapper::refreshMap()
 {/*{{{*/
+    GameMapLayer* gml = (GameMapLayer*)getParent();
+
     GameMapLayer* l = GameMapLayer::getInstance();
     int i, j;
     int sx = l->mGameMap.centerX - MAPWIDTH / 2;
@@ -102,16 +104,27 @@ void TileMapWrapper::refreshMap()
                 tiles[i][j]->setVisible(false);
             }
             if (n->creature) {
-                CCSprite * s = n->creature->getSprite();
+                CCSprite* s = n->creature->getSprite();
+                CCSprite* b = n->creature->getBar();
                 if (s) {
-                    s->setPosition(ccp(origin.x + (i - ny) * 32 + 16, origin.y + (j - ny) * 32 + 16));
+                    s->setPosition(ccp(origin.x + (i - nx) * 32 + 16, origin.y + (j - ny) * 32 + 16));
+                    b->setPosition(ccp(origin.x + (i - nx) * 32 + 16, origin.y + (j - ny) * 32 + 16 + 32));
+
                     if (this->getChildByTag(s->getTag()) == NULL) {
-                        if (s->getTag() == 1000)
+                        if (s->getTag() == 1000) {
                             this->addChild(s, 11);
-                        else
+                            this->addChild(b, 11);
+                        } else {
                             this->addChild(s, 10); // , s->getTag());
+                            this->addChild(b, 10);
+                        }
                     }
                     s->setVisible(tiles[i][j]->isVisible());
+                    if (gml->getClickType() == GameMapLayer::CT_ATTACK) {
+                        b->setVisible(tiles[i][j]->isVisible());
+                    } else {
+                        b->setVisible(false);
+                    }
                     // s->setVisible(true);
                 }
             }
@@ -224,12 +237,13 @@ void GameMapLayer::setClickType(CLICKTYPE type)
     Hero* hero = Hero::getInstance();
     if (mClickType != type) {
         tmw->removeAllPathGrids();
-        tmw->mGrid->setVisible(false);
         tmw->mGridPosition.x = hero->x;
         tmw->mGridPosition.y = hero->y;
         tmw->useRedGrid();
+        tmw->showGrid(false);
     }
     mClickType = type;
+    tmw->refreshMap();
 }
 
 void GameMapLayer::onClick(cocos2d::CCPoint point)
@@ -309,7 +323,52 @@ void GameMapLayer::onClick(cocos2d::CCPoint point)
 
 void GameMapLayer::onEnsureAttack()
 {
-    RUN_HERE();
+    // RUN_HERE();
+    Hero* hero = Hero::getInstance();
+    GameMap::Node* n = mGameMap.at(tmw->mGridPosition.x, tmw->mGridPosition.y);
+    Creature* c = n->creature;
+    if (c != NULL) {
+        GameScene* s = (GameScene*)this->getParent();
+        s->setTouchEnabled(false);
+
+        mEmitter = CCParticleMeteor::create();
+        this->addChild(mEmitter);
+        mEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fireball.png"));
+        mEmitter->setScale(0.5f);
+
+        CCPoint pt = mapToPoint(ccp(hero->x, hero->y));
+        mEmitter->setPosition(pt);
+
+        pt = mapToPoint(tmw->mGridPosition);
+        CCMoveTo* ct = CCMoveTo::create(0.5f, pt);
+        CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameMapLayer::onEmitterMoveFinished));
+        mEmitter->runAction(CCSequence::create(ct, cf, NULL));
+    }
+}
+
+void GameMapLayer::onEmitterMoveFinished(cocos2d::CCObject* pSender)
+{
+    this->removeChild(mEmitter);
+
+    Hero* hero = Hero::getInstance();
+    GameMap::Node* n = mGameMap.at(tmw->mGridPosition.x, tmw->mGridPosition.y);
+    Creature* c = n->creature;
+    if (c != NULL) {
+        hero->attack(c);
+
+        // die
+        if (c->currentHp() <= 0) {
+            tmw->removeChild(c->getSprite());
+            tmw->removeChild(c->getBar());
+            n->creature = NULL;
+            delete c;
+            tmw->showGrid(false);
+        }
+    }
+    tmw->refreshMap();
+
+    GameScene* s = (GameScene*)this->getParent();
+    s->setTouchEnabled(true);
 }
 
 void GameMapLayer::onEnsureExamine()
@@ -433,5 +492,31 @@ cocos2d::CCPoint GameMapLayer::pointToMap(cocos2d::CCPoint point)
 
     return pt;
 }/*}}}*/
+
+cocos2d::CCPoint GameMapLayer::mapToPoint(cocos2d::CCPoint point)
+{
+    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+
+    CCPoint center;
+    center.x = origin.x + visibleSize.width / 2;
+    center.y = origin.y + visibleSize.height / 2;
+
+    CCPoint dd;
+    dd.x = (((MAPWIDTH + 1) % 2) / 2.0f) * 32;
+    dd.y = (((MAPHEIGHT + 1) % 2) / 2.0f) * 32;
+
+
+    CCPoint dp;
+    dp = ccpSub(point, ccp(mGameMap.centerX, mGameMap.centerY));
+    dp.x *= 32;
+    dp.y *= 32;
+
+    CCPoint pt;
+    pt = ccpAdd(center, dp);
+    pt = ccpAdd(pt, dd);
+
+    return pt;
+}
 
 
