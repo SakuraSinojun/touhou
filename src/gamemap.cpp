@@ -321,6 +321,58 @@ void GameMap::centerMap(int x, int y)
     genChunks();
 }
 
+
+bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
+{
+    int dx = n->x - from->x;
+    int dy = n->y - from->y;
+    int ax = abs(dx);
+    int ay = abs(dy);
+
+    if (dx == 0 && dy == 0)
+        return true;
+    if (dx == 0) {
+        int step = dy / abs(dy);
+        for (int y = from->y + step; y != n->y; y += step) {
+            Node* nd = at(n->x, y);
+            if (nd->blocksight)
+                return false;
+        }
+        return true;
+    }
+
+    if (dy == 0) {
+        int step = dx / abs(dx);
+        for (int x = from->x + step; x != n->x; x += step) {
+            Node* nd = at(x, n->y);
+            if (nd->blocksight)
+                return false;
+        }
+        return true;
+    }
+
+    int sx = dx / abs(dx);
+    int sy = dy / abs(dy);
+    if (ax >= ay) {
+        int x, y;
+        for (x = from->x; x != n->x; x+= sx) {
+            y = from->y + (x - from->x) * dy / dx;
+            Node* nd = at(x, y);
+            if (nd->blocksight)
+                return false;
+        }
+    } else {
+        int x, y;
+        for (y = from->y; y != n->y; y+= sy) {
+            x = from->x + (y - from->y) * dx / dy;
+            Node* nd = at(x, y);
+            if (nd->blocksight)
+                return false;
+        }
+    }
+    return true;
+}
+
 bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
 {/*{{{*/
     std::list<Pt> OpenTable;

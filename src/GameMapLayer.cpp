@@ -80,6 +80,9 @@ void TileMapWrapper::refreshMap()
 
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
+    Hero* hero = Hero::getInstance();
+    GameMap::Node* heronode = l->mGameMap.at(hero->x, hero->y);
+
     for (i=0; i<MAPWIDTH; i++) {
         for (j=0; j<MAPHEIGHT; j++) {
             int x = sx + i;
@@ -92,7 +95,11 @@ void TileMapWrapper::refreshMap()
             }
             tiles[i][j]->setPosition(ccp(origin.x + (i - nx) * 32 + 16, origin.y + (j - nx) * 32 + 16));
             tiles[i][j]->setType(n->type);
-            tiles[i][j]->setVisible(true);
+            if (l->mGameMap.isNodeCanBeSeen(n, heronode)) {
+                tiles[i][j]->setVisible(true);
+            } else {
+                tiles[i][j]->setVisible(false);
+            }
             if (n->creature) {
                 CCSprite * s = n->creature->getSprite();
                 if (s) {

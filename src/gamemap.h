@@ -145,6 +145,7 @@ public:
     };
     bool findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp);
 
+    bool isNodeCanBeSeen(Node* n, Node* from);
 private:
     std::map<ChunkId, Chunk*>   chunks;
 
