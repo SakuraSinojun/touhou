@@ -19,3 +19,11 @@
 *.exe
 *.out
 *.app
+*.swp
+
+proj.android/assets
+proj.android/obj
+proj.android/out
+src/bin
+src/obj
+
