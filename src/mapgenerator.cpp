@@ -180,7 +180,7 @@ void MapGenerator::makeRoom(int x, int y, int w, int h)
             // monsters spawn
             if (i != 0 || j != 0) {
                 int d = rand() % 100;
-                if (d == 5 && n->creature == NULL) {
+                if (d <= 2 && n->creature == NULL) {
                     DarkGhost* dg = new DarkGhost();
                     dg->x = i;
                     dg->y = j;

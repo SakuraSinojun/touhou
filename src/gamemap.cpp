@@ -414,6 +414,14 @@ bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
                     continue;
                 }
 
+                // 是否走到阴影里
+                /*
+                Node* st = at(x0, y0);
+                if (!isNodeCanBeSeen(n, st))
+                    continue;
+                */
+
+
                 Pt p0(x, y, x1, y1);
                 if (std::find(ClosedTable.begin(), ClosedTable.end(), p0) != ClosedTable.end())
                     continue;

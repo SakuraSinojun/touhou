@@ -110,7 +110,8 @@ void TileMapWrapper::refreshMap()
                         else
                             this->addChild(s, 10); // , s->getTag());
                     }
-                    s->setVisible(true);
+                    s->setVisible(tiles[i][j]->isVisible());
+                    // s->setVisible(true);
                 }
             }
         }
