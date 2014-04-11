@@ -373,6 +373,13 @@ bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
     return true;
 }
 
+
+float GameMap::calcDistance(Node* n1, Node* n2)
+{
+    return sqrtf((n1->x - n2->x) * (n1->x - n2->x) + (n1->y - n2->y) * (n1->y  - n2->y));
+}
+
+
 bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
 {/*{{{*/
     std::list<Pt> OpenTable;

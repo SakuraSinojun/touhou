@@ -29,6 +29,7 @@ bool TileMapWrapper::init()
     mGrid->setPosition(ccp(0, 0));
     mGrid->setVisible(false);
     this->addChild(mGrid, 11);
+    mIsGreenGrid = false;
 
     mGridPosition.x = -100;
     mGridPosition.y = -100;
@@ -139,6 +140,34 @@ void TileMapWrapper::refreshMap()
     }
 }/*}}}*/
 
+void TileMapWrapper::useRedGrid()
+{/*{{{*/
+    if (!isGreenGrid())
+        return;
+
+    this->removeChild(mGrid);
+    mGrid = CCSprite::create("RedGrid.png");
+    this->addChild(mGrid, 11);
+
+    mIsGreenGrid = false;
+}/*}}}*/
+
+void TileMapWrapper::useGreenGrid()
+{/*{{{*/
+    if (isGreenGrid())
+        return;
+    this->removeChild(mGrid);
+    mGrid = CCSprite::create("GreenGrid.png");
+    this->addChild(mGrid, 11);
+    mIsGreenGrid = true;
+}/*}}}*/
+
+void TileMapWrapper::showGrid(bool show)
+{
+    mGrid->setVisible(show);
+}
+
+
 class CHelper {
 public:
     void operator() (int x, int y) {
@@ -165,6 +194,8 @@ bool GameMapLayer::init()
 
     tmw = TileMapWrapper::create();
     this->addChild(tmw);
+    mClickType = CT_MOVE;
+
     return true;
 }/*}}}*/
 
@@ -188,39 +219,103 @@ void GameMapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* eve
 {
 }
 
+void GameMapLayer::setClickType(CLICKTYPE type)
+{
+    Hero* hero = Hero::getInstance();
+    if (mClickType != type) {
+        tmw->removeAllPathGrids();
+        tmw->mGrid->setVisible(false);
+        tmw->mGridPosition.x = hero->x;
+        tmw->mGridPosition.y = hero->y;
+        tmw->useRedGrid();
+    }
+    mClickType = type;
+}
+
 void GameMapLayer::onClick(cocos2d::CCPoint point)
-{/*{{{*/
+{
     Hero* hero = Hero::getInstance();
 
-    CCPoint pt = pointToMap(point);
-    if (pt.x == tmw->mGridPosition.x && pt.y == tmw->mGridPosition.y) {
-        if (pt.x != hero->x || pt.y != hero->y)
-            onEnsureMove();
-        return;
-    }
-    tmw->mGridPosition = pointToMap(point);
-
-    tmw->removeAllPathGrids();
-    CHelper ch;
-    if (findPath(ccp(hero->x, hero->y), ccp(tmw->mGridPosition.x, tmw->mGridPosition.y), ch)) {
-        tmw->mGrid->setVisible(false);
-        std::list<CCPoint>::iterator it;
-        // RUN_HERE() << "count = " << ch.nodes.size();
-        for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
-            if (it == ch.nodes.begin())
-                continue;
-
-            CCSprite* sp = CCSprite::create("GreenGrid.png");
-            TileMapWrapper::PathGrid pg(sp, *it);
-            tmw->mPathGrids.push_back(pg);
-            tmw->addChild(sp, 12);
+    if (mClickType == CT_MOVE) {
+        // {{{
+        CCPoint pt = pointToMap(point);
+        if (pt.x == tmw->mGridPosition.x && pt.y == tmw->mGridPosition.y) {
+            if (pt.x != hero->x || pt.y != hero->y)
+                onEnsureMove();
+            return;
         }
-    } else {
-        tmw->mGrid->setVisible(true);
-    }
+        tmw->mGridPosition = pointToMap(point);
 
-    tmw->refreshMap();
-}/*}}}*/
+        tmw->removeAllPathGrids();
+        CHelper ch;
+        if (findPath(ccp(hero->x, hero->y), ccp(tmw->mGridPosition.x, tmw->mGridPosition.y), ch)) {
+            tmw->mGrid->setVisible(false);
+            std::list<CCPoint>::iterator it;
+            // RUN_HERE() << "count = " << ch.nodes.size();
+            for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
+                if (it == ch.nodes.begin())
+                    continue;
+
+                CCSprite* sp = CCSprite::create("GreenGrid.png");
+                TileMapWrapper::PathGrid pg(sp, *it);
+                tmw->mPathGrids.push_back(pg);
+                tmw->addChild(sp, 12);
+            }
+        } else {
+            tmw->mGrid->setVisible(true);
+        }
+
+        tmw->refreshMap();
+        // }}}
+    } else if (mClickType == CT_ATTACK) {
+        // {{{
+        CCPoint pt = pointToMap(point);
+        if (pt.x == tmw->mGridPosition.x && pt.y == tmw->mGridPosition.y) {
+            if ((pt.x != hero->x || pt.y != hero->y) && tmw->isGreenGrid())
+                onEnsureAttack();
+            return;
+        }
+
+        tmw->mGridPosition = pointToMap(point);
+        Creature* c = mGameMap.at(pt.x, pt.y)->creature;
+
+        tmw->useGreenGrid();
+        if (!c) {
+            tmw->useRedGrid();
+        }
+        GameMap::Node* h = mGameMap.at(hero->x, hero->y);
+        GameMap::Node* t = mGameMap.at(pt.x, pt.y);
+
+        float dist = mGameMap.calcDistance(h, t);
+        if (dist > hero->attackRange())
+            tmw->useRedGrid();
+        if (pt.x == hero->x && pt.y == hero->y) {
+            tmw->showGrid(false);
+        } else {
+            tmw->showGrid(true);
+        }
+
+        tmw->refreshMap();
+        // }}}
+    } else if (mClickType == CT_EXAMINE) {
+        CCPoint pt = pointToMap(point);
+        tmw->mGridPosition = pt;
+        tmw->useGreenGrid();
+        onEnsureExamine();
+
+        tmw->refreshMap();
+    }
+}
+
+void GameMapLayer::onEnsureAttack()
+{
+    RUN_HERE();
+}
+
+void GameMapLayer::onEnsureExamine()
+{
+    RUN_HERE();
+}
 
 void GameMapLayer::onEnsureMove()
 {/*{{{*/
@@ -241,7 +336,7 @@ void GameMapLayer::onEnsureMove()
 }/*}}}*/
 
 void GameMapLayer::Walk(Direction direction)
-{
+{/*{{{*/
     Hero* hero = Hero::getInstance();
 
     CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage("hero.png");
@@ -285,10 +380,10 @@ void GameMapLayer::Walk(Direction direction)
     }
     */
 
-}
+}/*}}}*/
 
 void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
-{
+{/*{{{*/
     // RUN_HERE();
     Hero::getInstance()->getSprite()->stopAllActions();
 
@@ -312,10 +407,10 @@ void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
         mDirections.pop_front();
         Walk(d);
     }
-}
+}/*}}}*/
 
 cocos2d::CCPoint GameMapLayer::pointToMap(cocos2d::CCPoint point)
-{
+{/*{{{*/
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
@@ -337,6 +432,6 @@ cocos2d::CCPoint GameMapLayer::pointToMap(cocos2d::CCPoint point)
     pt.y = mGameMap.centerY + dp.y;
 
     return pt;
-}
+}/*}}}*/
 
 

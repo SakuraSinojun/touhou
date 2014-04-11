@@ -46,8 +46,9 @@ public:
 
 public:
     // character
-    int currentHp();
-    int maxHp();
+    virtual int currentHp();
+    virtual int maxHp();
+    virtual int attackRange();
 
 protected:
     cocos2d::CCSprite* mSprite;

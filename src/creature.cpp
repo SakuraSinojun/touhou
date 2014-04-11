@@ -63,5 +63,10 @@ int Creature::maxHp()
     return 10;
 }
 
+int Creature::attackRange()
+{
+    return 2;
+}
+
 
 

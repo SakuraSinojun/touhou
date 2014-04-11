@@ -25,6 +25,11 @@ public:
     cocos2d::CCSprite*  mGrid;
     cocos2d::CCPoint    mGridPosition;
 
+    void useRedGrid();
+    void useGreenGrid();
+    bool isGreenGrid() { return mIsGreenGrid; }
+    void showGrid(bool show);
+
     class PathGrid {
     public:
         PathGrid() : sprite(NULL) {}
@@ -38,6 +43,7 @@ public:
 
 private:
     MapTile* tiles[MAPWIDTH][MAPHEIGHT];
+    bool mIsGreenGrid;
 };
 
 class GameMapLayer : public  cocos2d::CCLayer
@@ -69,16 +75,31 @@ public:
     }
 
     GameMap& gamemap() { return mGameMap; }
+    GameMap             mGameMap;
+
+    typedef enum {
+        CT_MOVE,
+        CT_ATTACK,
+        CT_EXAMINE,
+    } CLICKTYPE;
+    void setClickType(CLICKTYPE type);
+    CLICKTYPE getClickType() { return mClickType; }
 
     void onClick(cocos2d::CCPoint point);
     void onEnsureMove();
+    void onEnsureAttack();
+    void onEnsureExamine();
 
-    GameMap             mGameMap;
+    int getMapLayerWidth() { return MAPWIDTH * 32; }
+    int getMapLayerHeight() { return MAPHEIGHT * 32; }
+
 private:
     void registerWithTouchDispatcher();
     void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
 
     cocos2d::CCPoint pointToMap(cocos2d::CCPoint point);
+
+    CLICKTYPE   mClickType;
 
 private:
     TileMapWrapper * tmw;
@@ -108,7 +129,5 @@ private:
 
     std::list<Direction>    mDirections;
 public:
-    int getMapLayerWidth() { return MAPWIDTH * 32; }
-    int getMapLayerHeight() { return MAPHEIGHT * 32; }
 };
 

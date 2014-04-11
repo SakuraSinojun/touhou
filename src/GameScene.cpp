@@ -10,7 +10,7 @@ USING_NS_CC;
 
 
 #define MAPMOVETIMEPERGRID  0.15f
-
+#define MENUZOOMPERIOD      0.1f
 
 bool GameSceneMainLayer::init()
 {
@@ -29,6 +29,7 @@ bool GameSceneMainLayer::init()
     mStatusLayer->setVisible(false);
     this->addChild(mStatusLayer, 100);
 
+    /*
     CCMenuItemFont* pStatus = CCMenuItemFont::create("Status", this, menu_selector(GameSceneMainLayer::onMenuStatus));
     CCMenuItemFont* pMagic  = CCMenuItemFont::create("Magic", this, menu_selector(GameSceneMainLayer::onMenuMagic));
     CCMenuItemFont* pZoomIn = CCMenuItemFont::create("ZoomIn", this, menu_selector(GameSceneMainLayer::onZoomIn));
@@ -38,8 +39,21 @@ bool GameSceneMainLayer::init()
     menu->alignItemsHorizontally();
     menu->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + 32));
     this->addChild(menu, 200);
+    */
 
+    pMove = CCMenuItemImage::create("icons/move.png", "icons/move.png", this, menu_selector(GameSceneMainLayer::onMenuMove));
+    pAttack = CCMenuItemImage::create("icons/attack.png", "icons/attack.png", this, menu_selector(GameSceneMainLayer::onMenuAttack));
+    pExamine = CCMenuItemImage::create("icons/examine.png", "icons/examine.png", this, menu_selector(GameSceneMainLayer::onMenuExamine));
+    pMagic = CCMenuItemImage::create("icons/magic.png", "icons/magic.png", this, menu_selector(GameSceneMainLayer::onMenuMagic));
+    pStatus = CCMenuItemImage::create("icons/status.png", "icons/status.png", this, menu_selector(GameSceneMainLayer::onMenuStatus));
+    pHero = CCMenuItemImage::create("icons/hero.png", "icons/hero.png", this, menu_selector(GameSceneMainLayer::onMenuHero));
+    pTurn = CCMenuItemImage::create("icons/turn.png", "icons/turn.png", this, menu_selector(GameSceneMainLayer::onMenuTurn));
+    CCMenu* menu = CCMenu::create(pMove, pAttack, pExamine, pMagic, pStatus, pHero, pTurn, NULL);
+    menu->alignItemsVerticallyWithPadding(5);
+    menu->setPosition(ccp(origin.x + visibleSize.width - pMove->getContentSize().width / 2 , origin.y + visibleSize.height / 2));
+    this->addChild(menu, 200);
 
+    pMove->setScale(1.5f);
     return true;
 }
 
@@ -55,6 +69,50 @@ void GameSceneMainLayer::onMenuStatus(cocos2d::CCObject* pSender)
 }
 
 void GameSceneMainLayer::onMenuMagic(cocos2d::CCObject* pSender)
+{
+}
+
+void GameSceneMainLayer::onMenuMove(cocos2d::CCObject* pSender)
+{
+    CCScaleTo* ct1 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
+    CCScaleTo* ct2 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
+    CCScaleTo* ct3 = CCScaleTo::create(MENUZOOMPERIOD, 1.5f);
+    pAttack->runAction(ct1);
+    pExamine->runAction(ct2);
+    pMove->runAction(ct3);
+
+    mGameLayer->gameMapLayer()->setClickType(GameMapLayer::CT_MOVE);
+}
+
+void GameSceneMainLayer::onMenuAttack(cocos2d::CCObject* pSender)
+{
+    CCScaleTo* ct1 = CCScaleTo::create(MENUZOOMPERIOD, 1.5f);
+    CCScaleTo* ct2 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
+    CCScaleTo* ct3 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
+    pAttack->runAction(ct1);
+    pExamine->runAction(ct2);
+    pMove->runAction(ct3);
+
+    mGameLayer->gameMapLayer()->setClickType(GameMapLayer::CT_ATTACK);
+}
+
+void GameSceneMainLayer::onMenuExamine(cocos2d::CCObject* pSender)
+{
+    CCScaleTo* ct1 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
+    CCScaleTo* ct2 = CCScaleTo::create(MENUZOOMPERIOD, 1.5f);
+    CCScaleTo* ct3 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
+    pAttack->runAction(ct1);
+    pExamine->runAction(ct2);
+    pMove->runAction(ct3);
+
+    mGameLayer->gameMapLayer()->setClickType(GameMapLayer::CT_EXAMINE);
+}
+
+void GameSceneMainLayer::onMenuHero(cocos2d::CCObject* pSender)
+{
+}
+
+void GameSceneMainLayer::onMenuTurn(cocos2d::CCObject* pSender)
 {
 }
 
