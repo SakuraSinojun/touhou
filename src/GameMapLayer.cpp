@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <algorithm>
 #include "GameMapLayer.h"
 #include "HeroCreator.h"
 #include "MapTile.h"
@@ -206,7 +207,9 @@ bool GameMapLayer::init()
     tmw = TileMapWrapper::create();
     this->addChild(tmw);
     mClickType = CT_MOVE;
-    mMovingCreature = NULL;
+
+    mCurrentCreature = Hero::getInstance();
+    mCurrentTurn = 0;
 
     return true;
 }/*}}}*/
@@ -321,7 +324,7 @@ void GameMapLayer::onClick(cocos2d::CCPoint point)
 }
 
 void GameMapLayer::onEnsureAttack()
-{
+{/*{{{*/
     // RUN_HERE();
     Hero* hero = Hero::getInstance();
     GameMap::Node* n = mGameMap.at(tmw->mGridPosition.x, tmw->mGridPosition.y);
@@ -343,10 +346,10 @@ void GameMapLayer::onEnsureAttack()
         CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameMapLayer::onEmitterMoveFinished));
         mEmitter->runAction(CCSequence::create(ct, cf, NULL));
     }
-}
+}/*}}}*/
 
 void GameMapLayer::onEmitterMoveFinished(cocos2d::CCObject* pSender)
-{
+{/*{{{*/
     this->removeChild(mEmitter);
 
     Hero* hero = Hero::getInstance();
@@ -357,6 +360,7 @@ void GameMapLayer::onEmitterMoveFinished(cocos2d::CCObject* pSender)
 
         // die
         if (c->currentHp() <= 0) {
+            removeActiveCreature(c);
             tmw->removeChild(c->getSprite());
             tmw->removeChild(c->getBar());
             n->creature = NULL;
@@ -366,9 +370,11 @@ void GameMapLayer::onEmitterMoveFinished(cocos2d::CCObject* pSender)
     }
     tmw->refreshMap();
 
-    GameScene* s = (GameScene*)this->getParent();
-    s->setTouchEnabled(true);
-}
+    // GameScene* s = (GameScene*)this->getParent();
+    // s->setTouchEnabled(true);
+
+    onTurn(0.5f);
+}/*}}}*/
 
 void GameMapLayer::onEnsureExamine()
 {
@@ -377,38 +383,23 @@ void GameMapLayer::onEnsureExamine()
 
 void GameMapLayer::onEnsureMove()
 {/*{{{*/
-    moveCreature(Hero::getInstance(), tmw->mGridPosition);
+    moveCurrentCreature(tmw->mGridPosition);
     return;
-
-    Hero* hero = Hero::getInstance();
-    CCPoint last(hero->x, hero->y);
-    std::list<TileMapWrapper::PathGrid>::iterator it;
-    for (it = tmw->mPathGrids.begin(); it != tmw->mPathGrids.end(); it++) {
-        CCPoint dp = ccpSub((*it).pt, last);
-        last = (*it).pt;
-        Direction d(dp.x, dp.y);
-        mDirections.push_back(d);
-    }
-
-    GameScene* scene = (GameScene*)this->getParent();
-    scene->setTouchEnabled(false);
-
-    onMoveFinished(this);
 }/*}}}*/
 
 void GameMapLayer::Walk(Direction direction)
 {/*{{{*/
-    if (mMovingCreature == NULL)
+    if (mCurrentCreature == NULL)
         return;
 
-    mMovingCreature->StartWalkingAnimation(direction.x(), direction.y());
-    CCPoint pt = mMovingCreature->getSprite()->getPosition();
+    mCurrentCreature->StartWalkingAnimation(direction.x(), direction.y());
+    CCPoint pt = mCurrentCreature->getSprite()->getPosition();
     pt.x += direction.x() * 32;
     pt.y += direction.y() * 32;
     CCMoveTo* hmt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
-    mMovingCreature->getSprite()->runAction(hmt);
+    mCurrentCreature->getSprite()->runAction(hmt);
 
-    mMovingCreature->move(direction.x(), direction.y(), &mGameMap);
+    mCurrentCreature->move(direction.x(), direction.y(), &mGameMap);
 
     pt = tmw->getPosition();
     pt.x -= direction.x() * 32;
@@ -436,9 +427,9 @@ void GameMapLayer::Walk(Direction direction)
 void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
 {/*{{{*/
     // RUN_HERE();
-    if (!mMovingCreature)
+    if (mCurrentCreature == NULL)
         return;
-    mMovingCreature->StopWalkingAnimation();
+    mCurrentCreature->StopWalkingAnimation();
 
     if (!tmw->mPathGrids.empty()) {
         TileMapWrapper::PathGrid& pg = tmw->mPathGrids.front();
@@ -446,12 +437,13 @@ void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
         tmw->mPathGrids.pop_front();
     }
     tmw->setPosition(ccp(0, 0));
-    centerMap(ccp(mMovingCreature->x, mMovingCreature->y));
+    centerMap(ccp(mCurrentCreature->x, mCurrentCreature->y));
 
     // go on.
     if (mDirections.empty()) {
-        GameScene* scene = (GameScene*)this->getParent();
-        scene->setTouchEnabled(true);
+        // GameScene* scene = (GameScene*)this->getParent();
+        // scene->setTouchEnabled(true);
+        onTurn(0.5f);
     } else {
         Direction d = mDirections.front();
         mDirections.pop_front();
@@ -459,15 +451,17 @@ void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
     }
 }/*}}}*/
 
-void GameMapLayer::moveCreature(Creature* c, cocos2d::CCPoint dest)
-{
-    if (c == NULL)
-        return;
+bool GameMapLayer::moveCurrentCreature(cocos2d::CCPoint dest)
+{/*{{{*/
+    if (mCurrentCreature == NULL)
+        return false;
+
+    Creature*& c = mCurrentCreature;
 
     if (tmw->mPathGrids.empty()) {
         CHelper ch;
         if (!findPath(ccp(c->x, c->y), dest, ch))
-            return;
+            return false;
 
         // RUN_HERE() << "count = " << ch.nodes.size();
         std::list<CCPoint>::iterator it;
@@ -492,13 +486,13 @@ void GameMapLayer::moveCreature(Creature* c, cocos2d::CCPoint dest)
         mDirections.push_back(d);
     }
 
-    GameScene* scene = (GameScene*)this->getParent();
-    scene->setTouchEnabled(false);
+    // GameScene* scene = (GameScene*)this->getParent();
+    // scene->setTouchEnabled(false);
 
-    mMovingCreature = c;
+    // mCurrentCreature = c;
     onMoveFinished(this);
-
-}
+    return true;
+}/*}}}*/
 
 cocos2d::CCPoint GameMapLayer::pointToMap(cocos2d::CCPoint point)
 {/*{{{*/
@@ -549,6 +543,87 @@ cocos2d::CCPoint GameMapLayer::mapToPoint(cocos2d::CCPoint point)
     pt = ccpAdd(pt, dd);
 
     return pt;
+}/*}}}*/
+
+void GameMapLayer::onTurn()
+{/*{{{*/
+    mCurrentTurn++;
+    RUN_HERE() << mCurrentTurn;
+    if ((mCurrentTurn % 3) == 0) {
+        mCurrentCreature->onEndTurn(this);
+        mCurrentCreature = nextCreature();
+    }
+    if (mCurrentCreature == NULL)
+        mCurrentCreature = Hero::getInstance();
+    mCurrentCreature->onTurn(this);
+}/*}}}*/
+
+void GameMapLayer::onTurn(float delay)
+{
+    idle(delay);
+}
+
+void GameMapLayer::onTurnHelper(float dt)
+{
+    this->unschedule(schedule_selector(GameMapLayer::onTurnHelper));
+    onTurn();
+}
+
+void GameMapLayer::idle(float delay)
+{
+    onTurn();
+    // this->scheduleOnce(schedule_selector(GameMapLayer::onTurnHelper), delay);
+}
+
+Creature* GameMapLayer::nextCreature()
+{/*{{{*/
+
+    Hero* hero = Hero::getInstance();
+    for (int x = hero->x - hero->senseRange(); x < hero->x + hero->senseRange(); x++) {
+        for (int y = hero->y - hero->senseRange(); y < hero->y + hero->senseRange(); y++) {
+            Creature* c = mGameMap.at(x, y)->creature;
+            if (c != NULL) {
+                addActiveCreature(c);
+            }
+        }
+    }
+
+    while (!mActiveCreatures.empty()) {
+        Creature* c = mActiveCreatures.front();
+        mActiveCreatures.pop_front();
+        if (c != hero) {
+            float dist = mGameMap.calcDistance(c->x, c->y, hero->x, hero->y);
+            if (dist > c->senseRange()) {
+                continue;
+            }
+            if (dist > c->sight()) {
+                continue;
+            }
+        }
+        mActiveCreatures.push_back(c);
+        return c;
+    }
+    return NULL;
+}/*}}}*/
+
+void GameMapLayer::removeActiveCreature(Creature* c)
+{/*{{{*/
+    if (c == NULL)
+        return;
+    std::list<Creature*>::iterator it;
+    it = std::find(mActiveCreatures.begin(), mActiveCreatures.end(), c);
+    if (it != mActiveCreatures.end())
+        mActiveCreatures.erase(it);
+}/*}}}*/
+
+void GameMapLayer::addActiveCreature(Creature* c)
+{/*{{{*/
+    if (c == NULL)
+        return;
+    std::list<Creature*>::iterator it;
+    it = std::find(mActiveCreatures.begin(), mActiveCreatures.end(), c);
+    if (it == mActiveCreatures.end())
+        mActiveCreatures.push_back(c);
 }/*}}}*/
 
 

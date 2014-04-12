@@ -94,6 +94,12 @@ public:
     int getMapLayerWidth() { return MAPWIDTH * 32; }
     int getMapLayerHeight() { return MAPHEIGHT * 32; }
 
+    void onTurn();
+    void onTurn(float delay);
+    void idle(float delay = 0);
+
+    bool moveCurrentCreature(cocos2d::CCPoint dest);
+
 private:
     void registerWithTouchDispatcher();
     void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
@@ -106,6 +112,8 @@ private:
     cocos2d::CCSprite*  mFireBall;
 
     void onEmitterMoveFinished(cocos2d::CCObject* pSender);
+
+    void onTurnHelper(float dt);
 
 private:
     TileMapWrapper * tmw;
@@ -135,9 +143,13 @@ private:
 
     std::list<Direction>    mDirections;
 
-    void moveCreature(Creature* c, cocos2d::CCPoint dest);
-    Creature* mMovingCreature;
+private:
+    Creature*   mCurrentCreature;
+    int         mCurrentTurn;
 
-public:
+    Creature*   nextCreature();
+    void        removeActiveCreature(Creature* c);
+    void        addActiveCreature(Creature* c);
+    std::list<Creature*>    mActiveCreatures;
 };
 

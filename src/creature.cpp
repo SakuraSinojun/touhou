@@ -1,5 +1,7 @@
 
 #include "creature.h"
+#include "GameMapLayer.h"
+#include "logging.h"
 
 USING_NS_CC;
 
@@ -92,10 +94,30 @@ int Creature::speed()
     return 5;
 }
 
-void Creature::turn()
+int Creature::sight()
+{
+    return 12;
+}
+
+int Creature::senseRange()
+{
+    return 20;
+}
+
+void Creature::onTurn(GameMapLayer* gml)
 {
     if (mAI)
         mAI->turn();
+    // gml->idle();
+    cocos2d::CCPoint pt;
+    pt.x = x + 1;
+    pt.y = y;
+    if (!gml->moveCurrentCreature(pt))
+        gml->idle();
+}
+
+void Creature::onEndTurn(GameMapLayer* gml)
+{
 }
 
 void Creature::StartWalkingAnimation(int dx, int dy)

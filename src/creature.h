@@ -7,9 +7,10 @@
 #include "HpBar.h"
 
 #include "ai/ai.h"
+#include "common/weak_ptr.h"
 
-
-class Creature
+class GameMapLayer;
+class Creature : public SupportsWeakPtr<Creature>
 {
 public:
     // constructor
@@ -64,9 +65,12 @@ public:
     virtual Creature& attack(Creature* o);
 
     virtual int speed();
+    virtual int sight();
+    virtual int senseRange();
 
     // 
-    virtual void turn();
+    virtual void onTurn(GameMapLayer* gml);
+    virtual void onEndTurn(GameMapLayer* gml);
 
 protected:
     cocos2d::CCSprite*  mSprite;

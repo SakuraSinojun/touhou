@@ -2,6 +2,7 @@
 
 #include "hero.h"
 #include "GameMapLayer.h"
+#include "GameScene.h"
 #include "cocos2d.h"
 USING_NS_CC;
 
@@ -28,8 +29,19 @@ Hero::~Hero()
 {
 }
 
-void Hero::turn()
+void Hero::onTurn(GameMapLayer* gml)
 {
+    RUN_HERE();
+    gml->centerMap(ccp(x, y));
+    GameScene* s = (GameScene*)gml->getParent();
+    s->setTouchEnabled(true);
+}
+
+void Hero::onEndTurn(GameMapLayer* gml)
+{
+    RUN_HERE();
+    GameScene* s = (GameScene*)gml->getParent();
+    s->setTouchEnabled(false);
 }
 
 void Hero::StartWalkingAnimation(int dx, int dy)
@@ -52,5 +64,16 @@ void Hero::StopWalkingAnimation()
 {
     getSprite()->stopAllActions();
 }
+
+int Hero::sight()
+{
+    return 20;
+}
+
+int Hero::senseRange()
+{
+    return 20;
+}
+
 
 

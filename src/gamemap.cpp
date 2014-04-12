@@ -378,7 +378,12 @@ bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
 
 float GameMap::calcDistance(Node* n1, Node* n2)
 {
-    return sqrtf((n1->x - n2->x) * (n1->x - n2->x) + (n1->y - n2->y) * (n1->y  - n2->y));
+    return calcDistance(n1->x, n1->y, n2->x, n2->y);
+}
+
+float GameMap::calcDistance(int x0, int y0, int x1, int y1)
+{
+    return sqrtf((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0  - y1));
 }
 
 
