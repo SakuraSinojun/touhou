@@ -8,6 +8,7 @@
 #include <math.h>
 #include <vector>
 #include "mapgenerator.h"
+#include "mapgenerator_room.h"
 #include "logging.h"
 
 
@@ -296,7 +297,7 @@ GameMap::GameMap()
     : centerX(0)
     , centerY(0)
 {
-    mGenerator = new MapGenerator(this);
+    mGenerator = new MapGeneratorRoom(this);
 }
 
 GameMap::~GameMap()

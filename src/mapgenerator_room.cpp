@@ -1,6 +1,6 @@
 
 
-#include "mapgenerator.h"
+#include "mapgenerator_room.h"
 #include <stdlib.h>
 #include <vector>
 #include <map>
@@ -19,13 +19,13 @@ USING_NS_CC;
 #define CROSSPERCENT    0.1f
 #define CROSSCHANCE     95
 
-MapGenerator::MapGenerator(GameMap* mp)
-    : mGameMap(mp)
+MapGeneratorRoom::MapGeneratorRoom(GameMap* mp)
+    : MapGenerator(mp)
     , first_room_gened(false)
 {
 }
 
-GameMap::BIOME MapGenerator::getRawBiome(int x, int y)
+GameMap::BIOME MapGeneratorRoom::getRawBiome(int x, int y)
 {
     int centerx = ((x / (BIOMESIZE / 2)) / 2) * BIOMESIZE;
     int centery = ((y / (BIOMESIZE / 2)) / 2) * BIOMESIZE;
@@ -45,7 +45,7 @@ GameMap::BIOME MapGenerator::getRawBiome(int x, int y)
     }
 }
 
-GameMap::BIOME MapGenerator::getBiome(int x, int y)
+GameMap::BIOME MapGeneratorRoom::getBiome(int x, int y)
 {
     return GameMap::BIOME_FOREST;
     int centerx = ((x / (BIOMESIZE / 2)) / 2) * BIOMESIZE;
@@ -95,7 +95,7 @@ GameMap::BIOME MapGenerator::getBiome(int x, int y)
     return biome;
 }
 
-void MapGenerator::GenMapsNearChunk(GameMap::ChunkId id)
+void MapGeneratorRoom::GenMapsNearChunk(GameMap::ChunkId id)
 {
     if (id.x == 0 && id.y == 0 && !first_room_gened) {
         makeRoom(-7, -7, 14, 14);
@@ -157,7 +157,7 @@ void MapGenerator::GenMapsNearChunk(GameMap::ChunkId id)
 
 }
 
-void MapGenerator::makeDoor(int x, int y)
+void MapGeneratorRoom::makeDoor(int x, int y)
 {
     GameMap::Node* n = mGameMap->at(x, y);
     n->type = GameMap::NODE_GRASS;
@@ -166,7 +166,7 @@ void MapGenerator::makeDoor(int x, int y)
     n->isWall = false;
 }
 
-void MapGenerator::makeRoom(int x, int y, int w, int h)
+void MapGeneratorRoom::makeRoom(int x, int y, int w, int h)
 {
     int i, j;
     for (i = x; i < x + w; i++) {
@@ -254,7 +254,7 @@ void MapGenerator::makeRoom(int x, int y, int w, int h)
     }
 }
 
-cocos2d::CCSize MapGenerator::nextRoomSize()
+cocos2d::CCSize MapGeneratorRoom::nextRoomSize()
 {
     int w = 0, h = 0;
     int type = rand() % 10;
@@ -275,7 +275,7 @@ cocos2d::CCSize MapGenerator::nextRoomSize()
     return CCSize(w, h);
 }
 
-bool MapGenerator::hasEnoughRoom(cocos2d::CCRect rect)
+bool MapGeneratorRoom::hasEnoughRoom(cocos2d::CCRect rect)
 {
     int i, j;
     for (i = rect.getMinX(); i < rect.getMaxX(); i++) {
@@ -290,7 +290,7 @@ bool MapGenerator::hasEnoughRoom(cocos2d::CCRect rect)
 
 
 
-bool MapGenerator::checkAndMakeWall(Wall& w)
+bool MapGeneratorRoom::checkAndMakeWall(Wall& w)
 {
     std::list<Wall>::iterator it;
     for (it = mWalls.begin(); it != mWalls.end(); it++) {
@@ -308,17 +308,17 @@ bool MapGenerator::checkAndMakeWall(Wall& w)
 
 
 
-bool MapGenerator::Wall::intersects(const MapGenerator::Wall& o)
+bool MapGeneratorRoom::Wall::intersects(const MapGeneratorRoom::Wall& o)
 {
     return !(getMaxX() < o.getMinX() || getMinX() > o.getMaxX() || getMaxY() < o.getMinY() || getMinY() > o.getMaxY());
 }
 
-bool MapGenerator::Wall::contains(const MapGenerator::Wall& o)
+bool MapGeneratorRoom::Wall::contains(const MapGeneratorRoom::Wall& o)
 {
     return (getMinX() <= o.getMinX() && getMaxX() >= o.getMaxX() && getMinY() <= o.getMinY() && getMaxY() >= o.getMaxY());
 }
 
-MapGenerator::Wall MapGenerator::Wall::operator-(const Wall& o)
+MapGeneratorRoom::Wall MapGeneratorRoom::Wall::operator-(const Wall& o)
 {
     // temporary
     return *this;

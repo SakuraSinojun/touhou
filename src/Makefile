@@ -17,7 +17,7 @@ SOURCES = 	main.cpp \
         	StatusLayer.cpp \
         	creature.cpp \
         	hero.cpp \
-        	mapgenerator.cpp \
+        	mapgenerator_room.cpp \
         	HpBar.cpp \
         	ai/normal.cpp \
 
