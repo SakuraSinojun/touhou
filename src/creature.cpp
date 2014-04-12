@@ -98,4 +98,12 @@ void Creature::turn()
         mAI->turn();
 }
 
+void Creature::StartWalkingAnimation(int dx, int dy)
+{
+}
+
+void Creature::StopWalkingAnimation()
+{
+}
+
 

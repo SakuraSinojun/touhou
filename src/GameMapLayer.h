@@ -11,6 +11,7 @@
 
 #define MAPWIDTH    ((DESIGNWIDTH / 32) + 4)
 #define MAPHEIGHT   ((DESIGNHEIGHT / 32) + 4)
+#define MAPMOVETIMEPERGRID 0.15f
 
 
 class MapTile;
@@ -133,6 +134,10 @@ private:
     void onMoveFinished(cocos2d::CCObject* pSender);
 
     std::list<Direction>    mDirections;
+
+    void moveCreature(Creature* c, cocos2d::CCPoint dest);
+    Creature* mMovingCreature;
+
 public:
 };
 

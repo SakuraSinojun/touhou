@@ -11,8 +11,6 @@
 
 USING_NS_CC;
 
-#define MAPMOVETIMEPERGRID 0.15f
-
 
 bool TileMapWrapper::init()
 {/*{{{*/
@@ -208,6 +206,7 @@ bool GameMapLayer::init()
     tmw = TileMapWrapper::create();
     this->addChild(tmw);
     mClickType = CT_MOVE;
+    mMovingCreature = NULL;
 
     return true;
 }/*}}}*/
@@ -378,6 +377,9 @@ void GameMapLayer::onEnsureExamine()
 
 void GameMapLayer::onEnsureMove()
 {/*{{{*/
+    moveCreature(Hero::getInstance(), tmw->mGridPosition);
+    return;
+
     Hero* hero = Hero::getInstance();
     CCPoint last(hero->x, hero->y);
     std::list<TileMapWrapper::PathGrid>::iterator it;
@@ -396,27 +398,17 @@ void GameMapLayer::onEnsureMove()
 
 void GameMapLayer::Walk(Direction direction)
 {/*{{{*/
-    Hero* hero = Hero::getInstance();
+    if (mMovingCreature == NULL)
+        return;
 
-    CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage("hero.png");
-    float w = texture->getContentSize().width / 4.0f;
-    float h = texture->getContentSize().height / 4.0f;
-    CCAnimation* animation = CCAnimation::create();
-    for (int i = 0; i < 4; i++) {
-        animation->addSpriteFrameWithTexture(texture, CCRectMake(i * w, 0, w, h));
-    }
-    animation->setDelayPerUnit(MAPMOVETIMEPERGRID / 2.0f);
-    CCAnimate* animate = CCAnimate::create(animation);
-    hero->getSprite()->runAction(CCRepeatForever::create(animate));
-
-    CCPoint pt = hero->getSprite()->getPosition();
+    mMovingCreature->StartWalkingAnimation(direction.x(), direction.y());
+    CCPoint pt = mMovingCreature->getSprite()->getPosition();
     pt.x += direction.x() * 32;
     pt.y += direction.y() * 32;
     CCMoveTo* hmt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
-    hero->getSprite()->runAction(hmt);
+    mMovingCreature->getSprite()->runAction(hmt);
 
-
-    hero->move(direction.x(), direction.y(), &mGameMap);
+    mMovingCreature->move(direction.x(), direction.y(), &mGameMap);
 
     pt = tmw->getPosition();
     pt.x -= direction.x() * 32;
@@ -444,18 +436,17 @@ void GameMapLayer::Walk(Direction direction)
 void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
 {/*{{{*/
     // RUN_HERE();
-    Hero::getInstance()->getSprite()->stopAllActions();
+    if (!mMovingCreature)
+        return;
+    mMovingCreature->StopWalkingAnimation();
 
     if (!tmw->mPathGrids.empty()) {
         TileMapWrapper::PathGrid& pg = tmw->mPathGrids.front();
         tmw->removeChild(pg.sprite);
         tmw->mPathGrids.pop_front();
     }
-
     tmw->setPosition(ccp(0, 0));
-
-    Hero* hero = Hero::getInstance();
-    centerMap(ccp(hero->x, hero->y));
+    centerMap(ccp(mMovingCreature->x, mMovingCreature->y));
 
     // go on.
     if (mDirections.empty()) {
@@ -467,6 +458,47 @@ void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
         Walk(d);
     }
 }/*}}}*/
+
+void GameMapLayer::moveCreature(Creature* c, cocos2d::CCPoint dest)
+{
+    if (c == NULL)
+        return;
+
+    if (tmw->mPathGrids.empty()) {
+        CHelper ch;
+        if (!findPath(ccp(c->x, c->y), dest, ch))
+            return;
+
+        // RUN_HERE() << "count = " << ch.nodes.size();
+        std::list<CCPoint>::iterator it;
+        for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
+            if (it == ch.nodes.begin())
+                continue;
+            CCSprite* sp = CCSprite::create("GreenGrid.png");
+            TileMapWrapper::PathGrid pg(sp, *it);
+            tmw->mPathGrids.push_back(pg);
+            tmw->addChild(sp, 12);
+        }
+        centerMap(ccp(c->x, c->y));
+        tmw->refreshMap();
+    }
+
+    CCPoint last(c->x, c->y);
+    std::list<TileMapWrapper::PathGrid>::iterator it;
+    for (it = tmw->mPathGrids.begin(); it != tmw->mPathGrids.end(); it++) {
+        CCPoint dp = ccpSub((*it).pt, last);
+        last = (*it).pt;
+        Direction d(dp.x, dp.y);
+        mDirections.push_back(d);
+    }
+
+    GameScene* scene = (GameScene*)this->getParent();
+    scene->setTouchEnabled(false);
+
+    mMovingCreature = c;
+    onMoveFinished(this);
+
+}
 
 cocos2d::CCPoint GameMapLayer::pointToMap(cocos2d::CCPoint point)
 {/*{{{*/
@@ -494,7 +526,7 @@ cocos2d::CCPoint GameMapLayer::pointToMap(cocos2d::CCPoint point)
 }/*}}}*/
 
 cocos2d::CCPoint GameMapLayer::mapToPoint(cocos2d::CCPoint point)
-{
+{/*{{{*/
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
@@ -517,6 +549,6 @@ cocos2d::CCPoint GameMapLayer::mapToPoint(cocos2d::CCPoint point)
     pt = ccpAdd(pt, dd);
 
     return pt;
-}
+}/*}}}*/
 
 

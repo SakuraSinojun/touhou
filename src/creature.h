@@ -28,6 +28,9 @@ public:
     cocos2d::CCSprite* getBar() { return mHpBar->getBar(); }
     // cocos2d::CCSprite* getHpBar() { return mHpBar; }
 
+    virtual void StartWalkingAnimation(int dx, int dy);
+    virtual void StopWalkingAnimation();
+
 public:
     // moving
     void MoveTo(int x_, int y_, GameMap* mp) {
