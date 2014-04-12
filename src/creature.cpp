@@ -9,6 +9,7 @@ Creature::Creature()
     : mSprite(NULL)
     , mHpBar(new HpBar())
     , mCurrentHP(10)
+    , mAI(NULL)
 {
 }
 
@@ -86,5 +87,15 @@ Creature& Creature::attack(Creature* o)
     return *this;
 }
 
+int Creature::speed()
+{
+    return 5;
+}
+
+void Creature::turn()
+{
+    if (mAI)
+        mAI->turn();
+}
 
 

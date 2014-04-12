@@ -6,6 +6,9 @@
 #include "logging.h"
 #include "HpBar.h"
 
+#include "ai/ai.h"
+
+
 class Creature
 {
 public:
@@ -57,10 +60,17 @@ public:
     virtual Creature& attack(Creature& o);
     virtual Creature& attack(Creature* o);
 
+    virtual int speed();
+
+    // 
+    virtual void turn();
+
 protected:
     cocos2d::CCSprite*  mSprite;
     HpBar*              mHpBar;
 
     int mCurrentHP;
+    
+    ai::AI*     mAI;
 };
 
