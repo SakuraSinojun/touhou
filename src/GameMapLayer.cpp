@@ -560,6 +560,12 @@ void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
     if (mDirections.empty()) {
         // GameScene* scene = (GameScene*)this->getParent();
         // scene->setTouchEnabled(true);
+        
+        // 就算没走到最大格数，这个回合也是移动完了的。
+        mCurrentCreature->speed() = 0;
+        tmw->setPosition(ccp(0, 0));
+        centerMap(ccp(mCurrentCreature->x, mCurrentCreature->y));
+
         onTurn(0.5f);
     } else {
         Direction d = mDirections.front();
