@@ -420,6 +420,8 @@ void GameMapLayer::onCreatureDie(Creature* c)
         return;
     }
 
+    mCurrentCreature->addExp(c->expOnDeath());
+
     removeActiveCreature(c);
     tmw->removeChild(c->getSprite());
     tmw->removeChild(c->getBar());
@@ -662,9 +664,14 @@ void GameMapLayer::onTurn()
     if ((mCurrentTurn % 2) == 0) {
         mCurrentCreature->onEndTurn(this);
         mCurrentCreature = nextCreature();
+        if (mCurrentCreature)
+            mCurrentCreature->onStartTurn(this);
     }
-    if (mCurrentCreature == NULL)
+    if (mCurrentCreature == NULL) {
         mCurrentCreature = Hero::getInstance();
+        mCurrentCreature->onStartTurn(this);
+    }
+    tmw->refreshMap();
     mCurrentCreature->onTurn(this);
 }/*}}}*/
 

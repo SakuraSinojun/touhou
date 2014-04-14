@@ -13,6 +13,7 @@ Creature::Creature()
     , mAI(NULL)
     , mMaxSpeed(5)
     , mSpeed(5)
+    , mLevel(1)
 {
     mCurrentHP = maxHp();
 }
@@ -67,7 +68,7 @@ int Creature::currentHp()
 
 int Creature::maxHp()
 {
-    return 10;
+    return 10 * level();
 }
 
 int Creature::attackRange()
@@ -101,6 +102,10 @@ int Creature::senseRange()
     return 20;
 }
 
+void Creature::onStartTurn(GameMapLayer* gml)
+{
+}
+
 void Creature::onTurn(GameMapLayer* gml)
 {
     if (mAI)
@@ -119,5 +124,32 @@ void Creature::StartWalkingAnimation(int dx, int dy)
 void Creature::StopWalkingAnimation()
 {
 }
+
+int Creature::expOnDeath()
+{
+    return mLevel * 10;
+}
+
+int Creature::exp()
+{
+    return mExp;
+}
+
+int Creature::addExp(int d)
+{
+    mExp += d;
+    int ol = mLevel;
+    mLevel = mExp / 20 + 1;
+    if (mLevel != ol) {
+        this->mCurrentHP = maxHp();
+    }
+    return mLevel;
+}
+
+int Creature::level()
+{
+    return mLevel;
+}
+
 
 

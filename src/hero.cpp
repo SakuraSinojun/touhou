@@ -37,6 +37,15 @@ Hero::~Hero()
 {
 }
 
+void Hero::onStartTurn(GameMapLayer* gml)
+{
+    mCurrentHP += maxHp() / 10;
+    if (mCurrentHP > maxHp()) {
+        mCurrentHP = maxHp();
+    }
+    mHpBar->setPercent(mCurrentHP / maxHp());
+}
+
 void Hero::onTurn(GameMapLayer* gml)
 {
     gml->centerMap(ccp(x, y));
@@ -84,7 +93,7 @@ int Hero::senseRange()
 
 int Hero::maxHp()
 {
-    return 30;
+    return 30 * level();
 }
 
 

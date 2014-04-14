@@ -68,7 +68,13 @@ public:
     virtual int sight();
     virtual int senseRange();
 
+    int expOnDeath();
+    int exp();
+    int addExp(int d);
+    int level();
+
     // 
+    virtual void onStartTurn(GameMapLayer* gml);
     virtual void onTurn(GameMapLayer* gml);
     virtual void onEndTurn(GameMapLayer* gml);
 
@@ -81,5 +87,7 @@ protected:
     ai::AI*     mAI;
     int mMaxSpeed;
     int mSpeed;
+    int mLevel;
+    int mExp;
 };
 
