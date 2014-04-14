@@ -43,7 +43,7 @@ void Hero::onStartTurn(GameMapLayer* gml)
     if (mCurrentHP > maxHp()) {
         mCurrentHP = maxHp();
     }
-    mHpBar->setPercent(mCurrentHP / maxHp());
+    mHpBar->setPercent((float)mCurrentHP / maxHp());
 }
 
 void Hero::onTurn(GameMapLayer* gml)

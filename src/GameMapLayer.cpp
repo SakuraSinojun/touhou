@@ -55,10 +55,9 @@ void TileMapWrapper::removeAllPathGrids()
     mPathGrids.clear();
 }/*}}}*/
 
-
 void TileMapWrapper::refreshMap()
 {/*{{{*/
-    GameMapLayer* gml = (GameMapLayer*)getParent();
+    // GameMapLayer* gml = (GameMapLayer*)getParent();
 
     GameMapLayer* l = GameMapLayer::getInstance();
     if (l == NULL)
@@ -130,11 +129,14 @@ void TileMapWrapper::refreshMap()
                         }
                     }
                     s->setVisible(tiles[i][j]->isVisible());
+                    b->setVisible(tiles[i][j]->isVisible());
+                    /*
                     if (gml->getClickType() == GameMapLayer::CT_ATTACK) {
                         b->setVisible(tiles[i][j]->isVisible());
                     } else {
                         b->setVisible(false);
                     }
+                    */
                     // s->setVisible(true);
                 }
             }
