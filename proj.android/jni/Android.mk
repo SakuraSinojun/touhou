@@ -18,7 +18,10 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../src/StatusLayer.cpp \
                    ../../src/creature.cpp \
                    ../../src/hero.cpp \
-                   ../../src/mapgenerator.cpp \
+                   ../../src/mapgenerator_room.cpp \
+                   ../../src/HpBar.cpp \
+                   ../../src/ai/normal.cpp \
+                   ../../src/GameOverScene.cpp \
                    ../../src/dice.cpp
                    
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../src
