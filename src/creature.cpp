@@ -5,6 +5,7 @@
 
 USING_NS_CC;
 
+// 放到某个类里去以便回到初始化状态。
 static int g_tag = 1000;
 
 Creature::Creature()
@@ -16,6 +17,7 @@ Creature::Creature()
     , mLevel(1)
 {
     mCurrentHP = maxHp();
+    mHpBar->getBar()->setTag(g_tag++);
 }
 
 Creature::~Creature()
