@@ -31,7 +31,6 @@ Hero::~Hero()
 
 void Hero::onTurn(GameMapLayer* gml)
 {
-    RUN_HERE();
     gml->centerMap(ccp(x, y));
     GameScene* s = (GameScene*)gml->getParent();
     s->setTouchEnabled(true);
@@ -39,7 +38,7 @@ void Hero::onTurn(GameMapLayer* gml)
 
 void Hero::onEndTurn(GameMapLayer* gml)
 {
-    RUN_HERE();
+    Creature::onEndTurn(gml);
     GameScene* s = (GameScene*)gml->getParent();
     s->setTouchEnabled(false);
 }

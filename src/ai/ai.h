@@ -2,6 +2,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include "GameMapLayer.h"
 
 class Creature;
 
@@ -11,11 +12,13 @@ class AI
 {
 public:
     AI() : mCreature(NULL) {}
+    AI(Creature* c) : mCreature(c) {}
+    virtual ~AI() {}
 
     void attach(Creature* c) { mCreature = c; }
     Creature* creature() { return mCreature; }
 
-    virtual void turn() = 0;
+    virtual void turn(GameMapLayer* gml) = 0;
 
 private:
     Creature* mCreature;

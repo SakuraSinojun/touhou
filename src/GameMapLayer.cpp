@@ -154,6 +154,7 @@ void TileMapWrapper::refreshMap()
 
                 pg.sprite->setVisible(true);
                 pg.sprite->setPosition(ccp(origin.x + (x - nx) * 32 + 16, origin.y + (y - ny) * 32 + 16));
+                // RUN_HERE() << pg.sprite->getPosition();
             }
         }
     }
@@ -221,6 +222,11 @@ bool GameMapLayer::init()
     return true;
 }/*}}}*/
 
+void GameMapLayer::centerCreature(Creature* c)
+{
+    centerMap(ccp(c->x, c->y));
+}
+
 void GameMapLayer::centerMap(cocos2d::CCPoint point)
 {
     mGameMap.centerMap(point.x, point.y);
@@ -270,16 +276,25 @@ void GameMapLayer::onClick(cocos2d::CCPoint point)
         tmw->mGridPosition = pointToMap(point);
 
         tmw->removeAllPathGrids();
+
         CHelper ch;
         if (findPath(ccp(hero->x, hero->y), ccp(tmw->mGridPosition.x, tmw->mGridPosition.y), ch)) {
             tmw->mGrid->setVisible(false);
             std::list<CCPoint>::iterator it;
             // RUN_HERE() << "count = " << ch.nodes.size();
+            int speed = hero->speed();
             for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
                 if (it == ch.nodes.begin())
                     continue;
 
-                CCSprite* sp = CCSprite::create("GreenGrid.png");
+                CCSprite* sp;
+                if (speed > 0) {
+                    sp = CCSprite::create("GreenGrid.png");
+                } else {
+                    sp = CCSprite::create("RedGrid.png");
+                }
+                speed--;
+
                 TileMapWrapper::PathGrid pg(sp, *it);
                 tmw->mPathGrids.push_back(pg);
                 tmw->addChild(sp, 12);
@@ -390,6 +405,9 @@ void GameMapLayer::onEnsureExamine()
 
 void GameMapLayer::onEnsureMove()
 {/*{{{*/
+    if (Hero::getInstance()->speed() <= 0) {
+        return;
+    }
     moveCurrentCreature(tmw->mGridPosition);
     return;
 }/*}}}*/
@@ -405,8 +423,15 @@ void GameMapLayer::Walk(Direction direction)
     pt.y += direction.y() * 32;
     CCMoveTo* hmt = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
     mCurrentCreature->getSprite()->runAction(hmt);
+    pt = mCurrentCreature->getBar()->getPosition();
+    pt.x += direction.x() * 32;
+    pt.y += direction.y() * 32;
+    CCMoveTo* hmtb = CCMoveTo::create(MAPMOVETIMEPERGRID, pt);
+    mCurrentCreature->getBar()->runAction(hmtb);
+
 
     mCurrentCreature->move(direction.x(), direction.y(), &mGameMap);
+    mCurrentCreature->speed()--;
 
     pt = tmw->getPosition();
     pt.x -= direction.x() * 32;
@@ -437,6 +462,15 @@ void GameMapLayer::onMoveFinished(cocos2d::CCObject* pSender)
     if (mCurrentCreature == NULL)
         return;
     mCurrentCreature->StopWalkingAnimation();
+    if (mCurrentCreature->speed() <= 0) {
+        tmw->removeAllPathGrids();
+        mDirections.clear();
+        tmw->setPosition(ccp(0, 0));
+        centerMap(ccp(mCurrentCreature->x, mCurrentCreature->y));
+
+        onTurn(0.5f);
+        return;
+    }
 
     if (!tmw->mPathGrids.empty()) {
         TileMapWrapper::PathGrid& pg = tmw->mPathGrids.front();
@@ -464,24 +498,30 @@ bool GameMapLayer::moveCurrentCreature(cocos2d::CCPoint dest)
         return false;
 
     Creature*& c = mCurrentCreature;
+    // centerCreature(c);
 
     if (tmw->mPathGrids.empty()) {
         CHelper ch;
-        if (!findPath(ccp(c->x, c->y), dest, ch))
+        if (!findPath(ccp(c->x, c->y), dest, ch, false))
             return false;
 
         // RUN_HERE() << "count = " << ch.nodes.size();
+        int speed = c->speed();
         std::list<CCPoint>::iterator it;
         for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
             if (it == ch.nodes.begin())
                 continue;
-            CCSprite* sp = CCSprite::create("GreenGrid.png");
+            CCSprite* sp;
+            if (speed > 0) {
+                sp = CCSprite::create("GreenGrid.png");
+            } else {
+                sp = CCSprite::create("RedGrid.png");
+            }
+            speed --;
             TileMapWrapper::PathGrid pg(sp, *it);
             tmw->mPathGrids.push_back(pg);
             tmw->addChild(sp, 12);
         }
-        centerMap(ccp(c->x, c->y));
-        tmw->refreshMap();
     }
 
     CCPoint last(c->x, c->y);
@@ -555,7 +595,7 @@ cocos2d::CCPoint GameMapLayer::mapToPoint(cocos2d::CCPoint point)
 void GameMapLayer::onTurn()
 {/*{{{*/
     mCurrentTurn++;
-    RUN_HERE() << mCurrentTurn;
+    // RUN_HERE() << mCurrentTurn;
     if ((mCurrentTurn % 3) == 0) {
         mCurrentCreature->onEndTurn(this);
         mCurrentCreature = nextCreature();
@@ -632,5 +672,10 @@ void GameMapLayer::addActiveCreature(Creature* c)
     if (it == mActiveCreatures.end())
         mActiveCreatures.push_back(c);
 }/*}}}*/
+
+bool GameMapLayer::isHeroTurn()
+{
+    return mCurrentCreature == Hero::getInstance();
+}
 
 

@@ -145,7 +145,12 @@ public:
     public:
         virtual void operator() (int x, int y) = 0;
     };
+
+    // 包含(x1, y1)
     bool findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp);
+
+    // 不包含(x1, y1)
+    bool findPathTo(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp);
 
     bool isNodeCanBeSeen(Node* n, Node* from);
     float calcDistance(Node* n1, Node* n2);

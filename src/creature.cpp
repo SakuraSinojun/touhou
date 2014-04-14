@@ -12,6 +12,8 @@ Creature::Creature()
     , mHpBar(new HpBar())
     , mCurrentHP(10)
     , mAI(NULL)
+    , mMaxSpeed(5)
+    , mSpeed(5)
 {
 }
 
@@ -89,11 +91,6 @@ Creature& Creature::attack(Creature* o)
     return *this;
 }
 
-int Creature::speed()
-{
-    return 5;
-}
-
 int Creature::sight()
 {
     return 12;
@@ -107,17 +104,12 @@ int Creature::senseRange()
 void Creature::onTurn(GameMapLayer* gml)
 {
     if (mAI)
-        mAI->turn();
-    // gml->idle();
-    cocos2d::CCPoint pt;
-    pt.x = x + 1;
-    pt.y = y;
-    if (!gml->moveCurrentCreature(pt))
-        gml->idle();
+        mAI->turn(gml);
 }
 
 void Creature::onEndTurn(GameMapLayer* gml)
 {
+    mSpeed = mMaxSpeed;
 }
 
 void Creature::StartWalkingAnimation(int dx, int dy)

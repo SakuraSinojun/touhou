@@ -64,7 +64,7 @@ public:
     virtual Creature& attack(Creature& o);
     virtual Creature& attack(Creature* o);
 
-    virtual int speed();
+    int& speed() { return mSpeed; }
     virtual int sight();
     virtual int senseRange();
 
@@ -79,5 +79,7 @@ protected:
     int mCurrentHP;
     
     ai::AI*     mAI;
+    int mMaxSpeed;
+    int mSpeed;
 };
 

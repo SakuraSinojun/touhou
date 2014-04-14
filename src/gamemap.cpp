@@ -386,7 +386,7 @@ float GameMap::calcDistance(int x0, int y0, int x1, int y1)
 }
 
 
-bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
+bool GameMap::findPathTo(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
 {/*{{{*/
     std::list<Pt> OpenTable;
     std::list<Pt> ClosedTable;
@@ -423,8 +423,13 @@ bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
                     continue;
 
                 Node* n = at(x, y);
-                if (!n->canpass || n->creature != NULL) {
+                if (!n->canpass) {
                     continue;
+                }
+                if (n->creature != NULL) {
+                    if (!(x == x1 && y == y1)) {
+                        continue;
+                    }
                 }
 
                 // 是否走到阴影里
@@ -474,7 +479,7 @@ bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
     std::list<Pt> result;
 
     Pt last = Pt(x1, y1);
-    result.push_front(last);
+    // result.push_front(last);
 
     while (last.x != x0 || last.y != y0) {
         std::list<Pt>::iterator it = std::find(ClosedTable.begin(), ClosedTable.end(), last);
@@ -491,6 +496,18 @@ bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
     }
     return true;
 }/*}}}*/
+
+bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
+{
+    Node* n = at(x1, y1);
+    if (n->creature != NULL)
+        return false;
+    if (findPathTo(x0, y0, x1, y1, fp)) {
+        fp(x1, y1);
+        return true;
+    }
+    return false;
+}
 
 
 

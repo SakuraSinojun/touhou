@@ -84,7 +84,7 @@ private:
 
 } // namespace logging
 
-std::ostream& operator<<(std::ostream& o, cocos2d::CCPoint& pt);
+std::ostream& operator<<(std::ostream& o, cocos2d::CCPoint pt);
 std::ostream& operator<<(std::ostream& o, cocos2d::CCSize& sz);
 
 #if 1

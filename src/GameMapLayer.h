@@ -56,6 +56,7 @@ public:
 
     static GameMapLayer* getInstance();
 
+    void centerCreature(Creature* c);
     void centerMap(cocos2d::CCPoint point);
     cocos2d::CCPoint getMapCenter();
 
@@ -70,9 +71,13 @@ public:
     };
 
     template <class CallbackFunctor>
-    bool findPath(cocos2d::CCPoint pt1, cocos2d::CCPoint pt2, CallbackFunctor& fp) {
+    bool findPath(cocos2d::CCPoint pt1, cocos2d::CCPoint pt2, CallbackFunctor& fp, bool strict = true) {
         Helper<CallbackFunctor>  h(fp);
-        return mGameMap.findPath(pt1.x, pt1.y, pt2.x, pt2.y, h);
+        if (strict) {
+            return mGameMap.findPath(pt1.x, pt1.y, pt2.x, pt2.y, h);
+        } else {
+            return mGameMap.findPathTo(pt1.x, pt1.y, pt2.x, pt2.y, h);
+        }
     }
 
     GameMap& gamemap() { return mGameMap; }
@@ -97,8 +102,10 @@ public:
     void onTurn();
     void onTurn(float delay);
     void idle(float delay = 0);
+    int turnCount() { return mCurrentTurn; }
 
     bool moveCurrentCreature(cocos2d::CCPoint dest);
+    bool isHeroTurn();
 
 private:
     void registerWithTouchDispatcher();

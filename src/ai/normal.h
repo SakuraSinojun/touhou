@@ -8,7 +8,11 @@ namespace ai {
 class Normal : public AI
 {
 public:
-    virtual void turn();
+    Normal() : AI() {}
+    Normal(Creature* c) : AI(c) {}
+    virtual ~Normal() {}
+
+    virtual void turn(GameMapLayer* gml);
 };
 
 } // namespace ai;

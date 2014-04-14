@@ -59,6 +59,9 @@ bool GameSceneMainLayer::init()
 
 void GameSceneMainLayer::onMenuStatus(cocos2d::CCObject* pSender)
 {
+    if (!mGameLayer->gameMapLayer()->isHeroTurn())
+        return;
+
     if (mStatusLayer->isVisible()) {
         onBackFromStatusLayer();
     } else {
@@ -74,6 +77,9 @@ void GameSceneMainLayer::onMenuMagic(cocos2d::CCObject* pSender)
 
 void GameSceneMainLayer::onMenuMove(cocos2d::CCObject* pSender)
 {
+    if (!mGameLayer->gameMapLayer()->isHeroTurn())
+        return;
+
     CCScaleTo* ct1 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
     CCScaleTo* ct2 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
     CCScaleTo* ct3 = CCScaleTo::create(MENUZOOMPERIOD, 1.5f);
@@ -86,6 +92,9 @@ void GameSceneMainLayer::onMenuMove(cocos2d::CCObject* pSender)
 
 void GameSceneMainLayer::onMenuAttack(cocos2d::CCObject* pSender)
 {
+    if (!mGameLayer->gameMapLayer()->isHeroTurn())
+        return;
+
     CCScaleTo* ct1 = CCScaleTo::create(MENUZOOMPERIOD, 1.5f);
     CCScaleTo* ct2 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
     CCScaleTo* ct3 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
@@ -98,6 +107,9 @@ void GameSceneMainLayer::onMenuAttack(cocos2d::CCObject* pSender)
 
 void GameSceneMainLayer::onMenuExamine(cocos2d::CCObject* pSender)
 {
+    if (!mGameLayer->gameMapLayer()->isHeroTurn())
+        return;
+
     CCScaleTo* ct1 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
     CCScaleTo* ct2 = CCScaleTo::create(MENUZOOMPERIOD, 1.5f);
     CCScaleTo* ct3 = CCScaleTo::create(MENUZOOMPERIOD, 1.0f);
@@ -110,10 +122,17 @@ void GameSceneMainLayer::onMenuExamine(cocos2d::CCObject* pSender)
 
 void GameSceneMainLayer::onMenuHero(cocos2d::CCObject* pSender)
 {
+    if (!mGameLayer->gameMapLayer()->isHeroTurn())
+        return;
+    mGameLayer->gameMapLayer()->centerCreature(Hero::getInstance());
+    mGameLayer->gameMapLayer()->idle(0.5f);
 }
 
 void GameSceneMainLayer::onMenuTurn(cocos2d::CCObject* pSender)
 {
+    if (!mGameLayer->gameMapLayer()->isHeroTurn())
+        return;
+
 }
 
 void GameSceneMainLayer::onZoomIn(cocos2d::CCObject* pSender)
