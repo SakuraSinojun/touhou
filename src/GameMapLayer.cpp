@@ -97,7 +97,14 @@ void TileMapWrapper::refreshMap()
             }
             tiles[i][j]->setPosition(ccp(origin.x + (i - nx) * 32 + 16, origin.y + (j - nx) * 32 + 16));
             tiles[i][j]->setType(n->type);
-            if (l->mGameMap.isNodeCanBeSeen(n, heronode)) {
+
+            if (!n->explored) {
+                if (l->mGameMap.isNodeCanBeSeen(n, heronode)) {
+                    n->explored = true;
+                }
+            }
+             
+            if (n->explored) {
                 tiles[i][j]->setVisible(true);
             } else {
                 tiles[i][j]->setVisible(false);

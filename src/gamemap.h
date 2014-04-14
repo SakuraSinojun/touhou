@@ -44,6 +44,7 @@ public:
             , isWall(true)
             , hasConsidered(false)
             , biome(BIOME_FOREST)
+            , explored(false)
         {}
         ~Node() {}
         NODETYPE type;
@@ -55,6 +56,7 @@ public:
         bool isWall;
         bool hasConsidered;
         BIOME   biome;
+        bool explored;
     };
 
     class ChunkId {
