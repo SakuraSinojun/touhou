@@ -53,7 +53,6 @@ public:
     CREATE_FUNC(GameMapLayer)
     virtual bool init();
 
-
     static GameMapLayer* getInstance();
 
     void centerCreature(Creature* c);
@@ -105,6 +104,7 @@ public:
     int turnCount() { return mCurrentTurn; }
 
     bool moveCurrentCreature(cocos2d::CCPoint dest);
+    bool currentCreatureAttack(Creature* c);
     bool isHeroTurn();
 
 private:
@@ -121,6 +121,7 @@ private:
     void onEmitterMoveFinished(cocos2d::CCObject* pSender);
 
     void onTurnHelper(float dt);
+    void onCreatureDie(Creature* c);
 
 private:
     TileMapWrapper * tmw;
@@ -158,5 +159,7 @@ private:
     void        removeActiveCreature(Creature* c);
     void        addActiveCreature(Creature* c);
     std::list<Creature*>    mActiveCreatures;
+
+    Creature*   mAttackedCreature;
 };
 

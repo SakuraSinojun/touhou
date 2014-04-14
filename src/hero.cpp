@@ -15,6 +15,13 @@ Hero* Hero::getInstance()
     return g_hero;
 }
 
+void Hero::destroyHero()
+{
+    if (g_hero)
+        delete g_hero;
+    g_hero = NULL;
+}
+
 Hero::Hero()
     : Creature()
 {
@@ -23,6 +30,7 @@ Hero::Hero()
     CCPoint anchor = s->getAnchorPoint();
     anchor.y -= 16.0f / 48.0f;
     s->setAnchorPoint(anchor);
+    this->mCurrentHP = maxHp();
 }
 
 Hero::~Hero()
@@ -74,5 +82,9 @@ int Hero::senseRange()
     return 20;
 }
 
+int Hero::maxHp()
+{
+    return 30;
+}
 
 

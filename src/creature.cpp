@@ -10,11 +10,11 @@ static int g_tag = 1000;
 Creature::Creature()
     : mSprite(NULL)
     , mHpBar(new HpBar())
-    , mCurrentHP(10)
     , mAI(NULL)
     , mMaxSpeed(5)
     , mSpeed(5)
 {
+    mCurrentHP = maxHp();
 }
 
 Creature::~Creature()

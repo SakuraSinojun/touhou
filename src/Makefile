@@ -20,6 +20,7 @@ SOURCES = 	main.cpp \
         	mapgenerator_room.cpp \
         	HpBar.cpp \
         	ai/normal.cpp \
+        	GameOverScene.cpp \
 
 COCOS_ROOT = /home/kazuki/projects/kazuki/third_party/cocos2d-x-2.2.2
 include $(COCOS_ROOT)/cocos2dx/proj.linux/cocos2dx.mk

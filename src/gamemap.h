@@ -114,7 +114,7 @@ public:
     class Chunk {
     public:
         Chunk(ChunkId _id, GameMap* gm);
-        ~Chunk();
+        virtual ~Chunk() {}
 
         Chunk* upper();
         Chunk* under();
@@ -170,6 +170,11 @@ private:
 
 public:
     int centerX, centerY;
+    
+    // for generator
+    int lastX;
+    int lastY;
+    bool isFirstRoomGenerated;
 };
 
 

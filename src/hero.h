@@ -9,6 +9,7 @@ public:
     virtual ~Hero();
 
     static Hero* getInstance();
+    static void destroyHero();
 
     virtual int attackRange() { return 5; }
     virtual void onTurn(GameMapLayer* gml);
@@ -19,6 +20,8 @@ public:
 
     virtual int sight();
     virtual int senseRange();
+
+    virtual int maxHp();
 
 private:
 };

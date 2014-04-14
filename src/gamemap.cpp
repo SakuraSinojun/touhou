@@ -277,12 +277,11 @@ void GameMap::genChunks()
     }
     */
     const int GENRANGE = 4 * CHUNKWIDTH;
-    static int lastX = 0;
-    static int lastY = 0;
-    if (abs(centerX - lastX) > GENRANGE || abs(centerY - lastY) > GENRANGE || (lastX == 0 && lastY == 0)) {
+    if (abs(centerX - lastX) > GENRANGE || abs(centerY - lastY) > GENRANGE || !isFirstRoomGenerated) {
         mGenerator->GenMapsNearChunk(getCurrentChunkId());
         lastX = centerX;
         lastY = centerY;
+        isFirstRoomGenerated = true;
     }
 }
 
@@ -294,14 +293,26 @@ GameMap::ChunkId GameMap::getCurrentChunkId()
 }
 
 GameMap::GameMap()
-    : centerX(0)
+    : mGenerator(NULL)
+    , centerX(0)
     , centerY(0)
+    , lastX(0)
+    , lastY(0)
+    , isFirstRoomGenerated(false)
 {
     mGenerator = new MapGeneratorRoom(this);
 }
 
 GameMap::~GameMap()
 {
+    if (mGenerator)
+        delete mGenerator;
+
+    std::map<ChunkId, Chunk*>::iterator it;
+    for (it = chunks.begin(); it != chunks.end(); it++) {
+        delete it->second;
+    }
+    chunks.clear();
 }
 
 bool GameMap::isChunkGenerated(int x, int y)

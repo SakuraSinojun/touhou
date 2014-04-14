@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include "GameMapLayer.h"
+#include "GameOverScene.h"
 #include "HeroCreator.h"
 #include "MapTile.h"
 #include "GameScene.h"
@@ -60,6 +61,9 @@ void TileMapWrapper::refreshMap()
     GameMapLayer* gml = (GameMapLayer*)getParent();
 
     GameMapLayer* l = GameMapLayer::getInstance();
+    if (l == NULL)
+        return;
+
     int i, j;
     int sx = l->mGameMap.centerX - MAPWIDTH / 2;
     int sy = l->mGameMap.centerY - MAPHEIGHT / 2;
@@ -218,6 +222,7 @@ bool GameMapLayer::init()
 
     mCurrentCreature = Hero::getInstance();
     mCurrentTurn = 0;
+    mAttackedCreature = NULL;
 
     return true;
 }/*}}}*/
@@ -261,8 +266,39 @@ void GameMapLayer::setClickType(CLICKTYPE type)
     tmw->refreshMap();
 }
 
-void GameMapLayer::onClick(cocos2d::CCPoint point)
+
+bool GameMapLayer::currentCreatureAttack(Creature* c)
 {
+    if (mCurrentCreature == NULL)
+        return false;
+    if (mAttackedCreature != NULL)
+        return false;
+
+    mAttackedCreature = c;
+
+    Hero::getInstance()->onEndTurn(this);
+    /*
+    GameScene* s = (GameScene*)this->getParent();
+    s->setTouchEnabled(false);
+    */
+
+    mEmitter = CCParticleMeteor::create();
+    this->addChild(mEmitter);
+    mEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fireball.png"));
+    mEmitter->setScale(0.5f);
+    CCPoint pt = mapToPoint(ccp(mCurrentCreature->x, mCurrentCreature->y));
+    mEmitter->setPosition(pt);
+
+    pt = mapToPoint(ccp(c->x, c->y));
+    CCMoveTo* ct = CCMoveTo::create(0.5f, pt);
+    CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameMapLayer::onEmitterMoveFinished));
+    mEmitter->runAction(CCSequence::create(ct, cf, NULL));
+
+    return true;
+}
+
+void GameMapLayer::onClick(cocos2d::CCPoint point)
+{/*{{{*/
     Hero* hero = Hero::getInstance();
 
     if (mClickType == CT_MOVE) {
@@ -343,15 +379,17 @@ void GameMapLayer::onClick(cocos2d::CCPoint point)
 
         tmw->refreshMap();
     }
-}
+}/*}}}*/
 
 void GameMapLayer::onEnsureAttack()
 {/*{{{*/
     // RUN_HERE();
-    Hero* hero = Hero::getInstance();
+    // Hero* hero = Hero::getInstance();
     GameMap::Node* n = mGameMap.at(tmw->mGridPosition.x, tmw->mGridPosition.y);
     Creature* c = n->creature;
     if (c != NULL) {
+        currentCreatureAttack(c);
+        /*
         GameScene* s = (GameScene*)this->getParent();
         s->setTouchEnabled(false);
 
@@ -367,26 +405,46 @@ void GameMapLayer::onEnsureAttack()
         CCMoveTo* ct = CCMoveTo::create(0.5f, pt);
         CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(GameMapLayer::onEmitterMoveFinished));
         mEmitter->runAction(CCSequence::create(ct, cf, NULL));
+        */
     }
 }/*}}}*/
+
+void GameMapLayer::onCreatureDie(Creature* c)
+{
+    if (c == NULL)
+        return;
+
+    if (c == Hero::getInstance()) {
+        g_gamemaplayer = NULL;
+        CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(1.0f, GameOverScene::create()));
+        return;
+    }
+
+    removeActiveCreature(c);
+    tmw->removeChild(c->getSprite());
+    tmw->removeChild(c->getBar());
+
+    GameMap::Node* n = mGameMap.at(c->x, c->y);
+    n->creature = NULL;
+    delete c;
+}
 
 void GameMapLayer::onEmitterMoveFinished(cocos2d::CCObject* pSender)
 {/*{{{*/
     this->removeChild(mEmitter);
 
-    Hero* hero = Hero::getInstance();
-    GameMap::Node* n = mGameMap.at(tmw->mGridPosition.x, tmw->mGridPosition.y);
-    Creature* c = n->creature;
-    if (c != NULL) {
-        hero->attack(c);
+    if (mCurrentCreature == NULL)
+        return;
+
+    // mAttackedCreature;
+    // Hero* hero = Hero::getInstance();
+    // Creature* c = n->creature;
+    if (mAttackedCreature != NULL) {
+        mCurrentCreature->attack(mAttackedCreature);
 
         // die
-        if (c->currentHp() <= 0) {
-            removeActiveCreature(c);
-            tmw->removeChild(c->getSprite());
-            tmw->removeChild(c->getBar());
-            n->creature = NULL;
-            delete c;
+        if (mAttackedCreature->currentHp() <= 0) {
+            onCreatureDie(mAttackedCreature);
             tmw->showGrid(false);
         }
     }
@@ -395,6 +453,7 @@ void GameMapLayer::onEmitterMoveFinished(cocos2d::CCObject* pSender)
     // GameScene* s = (GameScene*)this->getParent();
     // s->setTouchEnabled(true);
 
+    mAttackedCreature = NULL;
     onTurn(0.5f);
 }/*}}}*/
 
@@ -596,7 +655,11 @@ void GameMapLayer::onTurn()
 {/*{{{*/
     mCurrentTurn++;
     // RUN_HERE() << mCurrentTurn;
-    if ((mCurrentTurn % 3) == 0) {
+
+    tmw->removeAllPathGrids();
+    tmw->showGrid(false);
+
+    if ((mCurrentTurn % 2) == 0) {
         mCurrentCreature->onEndTurn(this);
         mCurrentCreature = nextCreature();
     }

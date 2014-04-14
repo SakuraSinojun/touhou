@@ -24,7 +24,7 @@ bool MainScene::init()
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
     
-    CCSprite* pBackground = new CCSprite();
+    CCSprite* pBackground = CCSprite::create();
     pBackground->initWithFile("Titles/title.jpg");
     pBackground->setPosition(ccp(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
     pBackground->setVisible(false);

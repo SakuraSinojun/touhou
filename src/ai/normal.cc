@@ -14,11 +14,18 @@ void Normal::turn(GameMapLayer* gml)
     
     Hero* hero = Hero::getInstance();
     CCPoint pt(hero->x, hero->y);
-    if (gml->turnCount() % 3 == 1) {
-        if (!gml->moveCurrentCreature(pt))
+
+    float dist = gml->gamemap().calcDistance(creature()->x, creature()->y, hero->x, hero->y);
+    if (dist <= creature()->attackRange()) {
+        if (!gml->currentCreatureAttack(hero))
             gml->idle();
     } else {
-        gml->idle();
+        if (creature()->speed() > 0) {
+            if (!gml->moveCurrentCreature(pt))
+                gml->idle();
+        } else {
+            gml->idle();
+        }
     }
 }
 
