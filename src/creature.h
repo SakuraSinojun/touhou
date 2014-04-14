@@ -65,6 +65,9 @@ public:
     virtual Creature& attack(Creature* o);
 
     int& speed() { return mSpeed; }
+    void resetSpeed() { mSpeed = mMaxSpeed; }
+    int maxSpeed() { return mMaxSpeed; }
+
     virtual int sight();
     virtual int senseRange();
 

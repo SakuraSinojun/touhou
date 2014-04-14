@@ -104,6 +104,7 @@ int Creature::senseRange()
 
 void Creature::onStartTurn(GameMapLayer* gml)
 {
+    mSpeed = mMaxSpeed;
 }
 
 void Creature::onTurn(GameMapLayer* gml)
@@ -114,7 +115,6 @@ void Creature::onTurn(GameMapLayer* gml)
 
 void Creature::onEndTurn(GameMapLayer* gml)
 {
-    mSpeed = mMaxSpeed;
 }
 
 void Creature::StartWalkingAnimation(int dx, int dy)

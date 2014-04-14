@@ -191,6 +191,10 @@ void TileMapWrapper::useGreenGrid()
 void TileMapWrapper::showGrid(bool show)
 {
     mGrid->setVisible(show);
+    if (!show) {
+        mGridPosition.x = Hero::getInstance()->x;
+        mGridPosition.y = Hero::getInstance()->y;
+    }
 }
 
 
@@ -278,6 +282,7 @@ bool GameMapLayer::currentCreatureAttack(Creature* c)
 
     mAttackedCreature = c;
 
+    // disable touch
     Hero::getInstance()->onEndTurn(this);
     /*
     GameScene* s = (GameScene*)this->getParent();
@@ -321,13 +326,21 @@ void GameMapLayer::onClick(cocos2d::CCPoint point)
             std::list<CCPoint>::iterator it;
             // RUN_HERE() << "count = " << ch.nodes.size();
             int speed = hero->speed();
+            bool expandSpeed = false;
+            if (speed <= 0) {
+                speed = hero->maxSpeed();
+                expandSpeed = true;
+            }
             for (it = ch.nodes.begin(); it != ch.nodes.end(); it++) {
                 if (it == ch.nodes.begin())
                     continue;
 
                 CCSprite* sp;
                 if (speed > 0) {
-                    sp = CCSprite::create("GreenGrid.png");
+                    if (expandSpeed)
+                        sp = CCSprite::create("YellowGrid.png");
+                    else
+                        sp = CCSprite::create("GreenGrid.png");
                 } else {
                     sp = CCSprite::create("RedGrid.png");
                 }
@@ -469,7 +482,7 @@ void GameMapLayer::onEnsureExamine()
 void GameMapLayer::onEnsureMove()
 {/*{{{*/
     if (Hero::getInstance()->speed() <= 0) {
-        return;
+        Hero::getInstance()->resetSpeed();
     }
     moveCurrentCreature(tmw->mGridPosition);
     return;

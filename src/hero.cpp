@@ -39,6 +39,7 @@ Hero::~Hero()
 
 void Hero::onStartTurn(GameMapLayer* gml)
 {
+    Creature::onStartTurn(gml);
     mCurrentHP += maxHp() / 10;
     if (mCurrentHP > maxHp()) {
         mCurrentHP = maxHp();
