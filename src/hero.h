@@ -2,6 +2,8 @@
 #pragma once
 
 #include "creature.h"
+#include "MapWrapper.h"
+
 class Hero : public Creature
 {
 public:
@@ -10,7 +12,7 @@ public:
 
     static void destroyHero();
 
-    virtual int attackRange() { return 5; }
+    virtual int attackRange() { return 15; }
 
     /*
     virtual void onStartTurn(GameMapLayer* gml);
@@ -18,6 +20,7 @@ public:
     virtual void onEndTurn(GameMapLayer* gml);
     */
 
+    virtual bool attackAnimate(Creature& o, MapLayer* gml);
     virtual void StartWalkingAnimation(int dx, int dy);
     virtual void StopWalkingAnimation();
 
@@ -27,5 +30,12 @@ public:
     virtual int maxHp();
 
 private:
+    class ProjectileHelper : public ProjectileCallback {
+    public:
+        virtual void operator()();
+        MapLayer* gml;
+        Creature* creature;
+    };
+    ProjectileHelper    mProjectileHelper;
 };
 

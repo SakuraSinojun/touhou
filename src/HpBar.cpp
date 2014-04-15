@@ -35,6 +35,8 @@ HpBar::~HpBar()
     
 void HpBar::setPercent(float per)
 {
+    if (per < 0)
+        per = 0;
     mBar->setScaleX(per);
 }
 

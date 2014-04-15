@@ -3,6 +3,7 @@
 #include "MapLayer.h"
 #include "MapWrapper.h"
 #include "GameResource.h"
+#include "GameOverScene.h"
 #include "creature.h"
 #include "gamemap.h"
 #include "hero.h"
@@ -28,6 +29,7 @@ bool MapLayer::init()
     this->addChild(mMapWrapper);
 
     mIsMoving = false;
+    mIsAttacking = false;
 
     this->setTouchEnabled(true);
     return true;
@@ -40,6 +42,9 @@ void MapLayer::registerWithTouchDispatcher()
 
 void MapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
 {
+    if (mIsAttacking)
+        return;
+
     CCTouch* touch = (CCTouch*)(touches->anyObject());
     Hero* hero = GameResource::getInstance()->hero();
     GameMap* gamemap = GameResource::getInstance()->gameMap();
@@ -53,11 +58,38 @@ void MapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
 
     Creature* creature = gamemap->at(mDestPoint.x, mDestPoint.y)->creature;
     if (creature != NULL) {
-        RUN_HERE();
+        if (gamemap->calcDistance(creature->x, creature->y, hero->x, hero->y) <= hero->attackRange()) {
+            if (!startAttacking(creature)) {
+                onAttackFinished(creature);
+            }
+        }
     } else {
         mMapWrapper->mGridPosition = mDestPoint;
         mMapWrapper->showGrid(true);
         startMoving();
+    }
+}
+
+bool MapLayer::startAttacking(Creature* c)
+{
+    if (c == NULL)
+        return false;
+    mIsAttacking = true;
+    Hero* hero = GameResource::getInstance()->hero();
+    if (!hero->attack(c, this))
+        return false;
+    onTurn();
+    return true;
+}
+
+void MapLayer::onAttackFinished(Creature* c)
+{
+    mIsAttacking = false;
+    if (c == NULL)
+        return;
+    Hero* hero = GameResource::getInstance()->hero();
+    if (c->currentHp() <= 0) {
+        onCreatureDie(c, hero);
     }
 }
 
@@ -123,6 +155,12 @@ void MapLayer::onNextMoving(cocos2d::CCObject* pSender)
 
     hero->StopWalkingAnimation();
     // mMapWrapper->stopAllActions();
+
+    std::list<Creature*>::iterator it;
+    for (it = mActiveCreatures.begin(); it != mActiveCreatures.end(); it++) {
+        (*it)->getSprite()->stopAllActions();
+        (*it)->getBar()->stopAllActions();
+    }
 
     if (!moveBy1Grid()) {
         mIsMoving = false;
@@ -208,6 +246,26 @@ void MapLayer::addActiveCreature(Creature* c)
     if (it == mActiveCreatures.end())
         mActiveCreatures.push_back(c);
 }
+
+void MapLayer::onCreatureDie(Creature* c, Creature* attacker)
+{
+    if (c == NULL)
+        return;
+    if (c == GameResource::getInstance()->hero()) {
+        CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(1.0f, GameOverScene::create()));
+        return;
+    }
+    if (attacker) {
+        attacker->addExp(c->expOnDeath());
+    }
+    mMapWrapper->removeChild(c->getSprite());
+    mMapWrapper->removeChild(c->getBar());
+    GameMap::Node* n = GameResource::getInstance()->gameMap()->at(c->x, c->y);
+    n->creature = NULL;
+    removeActiveCreature(c);
+    delete c;
+}
+
 
 
 

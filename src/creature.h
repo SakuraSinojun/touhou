@@ -10,7 +10,7 @@
 #include "common/weak_ptr.h"
 
 class MapLayer;
-class Creature : public SupportsWeakPtr<Creature>
+class Creature : public SupportsWeakPtr<Creature>, public cocos2d::CCObject
 {
 public:
     // constructor
@@ -34,8 +34,11 @@ public:
 
     virtual bool findPathAndMove(int dx, int dy);
     virtual bool move(int dx, int dy, GameMap* mp);
-    virtual bool attack(Creature& o);
-    virtual bool attack(Creature* o);
+    virtual bool attack(Creature& o, MapLayer* gml);
+    virtual bool attack(Creature* o, MapLayer* gml);
+    virtual bool attackAnimate(Creature& o, MapLayer* gml);
+
+    virtual void onAttackFinished(cocos2d::CCObject* pSender);
 
 public:
     // moving
@@ -79,6 +82,8 @@ public:
 protected:
     cocos2d::CCSprite*  mSprite;
     HpBar*              mHpBar;
+    MapLayer*           mMapLayer;
+    Creature*           mTarget;
 
     int mCurrentHP;
     

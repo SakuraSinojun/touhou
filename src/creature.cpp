@@ -12,6 +12,8 @@ static int g_tag = 1000;
 Creature::Creature()
     : mSprite(NULL)
     , mHpBar(new HpBar())
+    , mMapLayer(NULL)
+    , mTarget(NULL)
     , mAI(NULL)
     , mMaxSpeed(5)
     , mSpeed(5)
@@ -79,19 +81,55 @@ int Creature::attackRange()
     return 1;
 }
 
-bool Creature::attack(Creature& o)
+
+bool Creature::attackAnimate(Creature& o, MapLayer* gml)
 {
-    o.mCurrentHP -= 3;
-    if (o.mCurrentHP <= 0)
-        o.mCurrentHP = 0;
-    o.mHpBar->setPercent((float)o.mCurrentHP / o.maxHp());
+    CCPoint hpt = getSprite()->getPosition();
+    CCPoint bpt = getBar()->getPosition();
+    CCPoint opt = o.getSprite()->getPosition();
+
+    CCPoint dp((opt.x - hpt.x) / 2.0f, (opt.y - hpt.y) / 2.0f);
+
+    CCPoint pt = ccpAdd(hpt, dp);
+    CCMoveTo* cth1 = CCMoveTo::create(MELEEDURATION, pt);
+    CCMoveTo* cth2 = CCMoveTo::create(MELEEDURATION, hpt);
+    CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(Creature::onAttackFinished));
+    getSprite()->runAction(CCSequence::create(cth1, cth2, cf, NULL));
+
+    pt = ccpAdd(bpt, dp);
+    CCMoveTo* ctb1 = CCMoveTo::create(MELEEDURATION, pt);
+    CCMoveTo* ctb2 = CCMoveTo::create(MELEEDURATION, bpt);
+    getBar()->runAction(CCSequence::create(ctb1, ctb2, NULL));
     return true;
 }
 
-bool Creature::attack(Creature* o)
+void Creature::onAttackFinished(CCObject* pSender)
+{
+    // GameMap* gamemap = GameResource::getInstance()->gameMap();
+    if (mTarget != NULL) {
+        mTarget->mCurrentHP -= 3;
+        if (mTarget->mCurrentHP <= 0)
+            mTarget->mCurrentHP = 0;
+        mTarget->mHpBar->setPercent((float)mTarget->currentHp() / mTarget->maxHp());
+    }
+    mMapLayer->onAttackFinished(mTarget);
+    mTarget = NULL;
+}
+
+bool Creature::attack(Creature& o, MapLayer* gml)
+{
+    mMapLayer = gml;
+    mTarget = &o;
+
+    if (!attackAnimate(o, gml))
+        return false;
+    return true;
+}
+
+bool Creature::attack(Creature* o, MapLayer* gml)
 {
     if (o)
-        return attack(*o);
+        return attack(*o, gml);
     return false;
 }
 

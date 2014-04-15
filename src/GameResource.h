@@ -2,11 +2,9 @@
 #pragma once
 
 #include "AppMacros.h"
-#include "gamemap.h"
-#include "hero.h"
 
-// class Hero;
-// class GameMap;
+class Hero;
+class GameMap;
 class GameResource
 {
 public:
@@ -39,4 +37,7 @@ private:
 
 #define HEROMOVEPERIOD   0.1f
 #define MAPMOVEPERIOD    0.1f
+
+#define MELEEDURATION   (HEROMOVEPERIOD / 2.0f)
+#define PROJECTILESPEED 0.05f
 

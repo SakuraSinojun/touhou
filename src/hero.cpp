@@ -1,8 +1,11 @@
 
 
 #include "hero.h"
-#include "GameMapLayer.h"
+#include "gamemap.h"
+#include "MapLayer.h"
+#include "MapWrapper.h"
 #include "GameScene.h"
+#include "GameResource.h"
 #include "cocos2d.h"
 USING_NS_CC;
 
@@ -57,7 +60,7 @@ void Hero::StartWalkingAnimation(int dx, int dy)
     for (int i = 0; i < 4; i++) {
         animation->addSpriteFrameWithTexture(texture, CCRectMake(i * w, 0, w, h));
     }
-    animation->setDelayPerUnit(MAPMOVETIMEPERGRID / 4.0f);
+    animation->setDelayPerUnit(HEROMOVEPERIOD / 4.0f);
     CCAnimate* animate = CCAnimate::create(animation);
     getSprite()->runAction(CCRepeatForever::create(animate));
 
@@ -67,6 +70,30 @@ void Hero::StopWalkingAnimation()
 {
     getSprite()->stopAllActions();
     getBar()->stopAllActions();
+}
+
+bool Hero::attackAnimate(Creature& o, MapLayer* gml)
+{
+    CCParticleMeteor* pm = CCParticleMeteor::create();
+    pm->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fireball.png"));
+    pm->setScale(0.2f);
+    float dist = GameResource::getInstance()->gameMap()->calcDistance(x, y, o.x, o.y);
+    mProjectileHelper.gml = gml;
+    mProjectileHelper.creature = &o;
+    if (!gml->wrapper()->addProjectile(pm, ccp(x, y), ccp(o.x, o.y), dist * PROJECTILESPEED, &mProjectileHelper))
+        return false;
+    return true;
+}
+
+void Hero::ProjectileHelper::operator()()
+{
+    if (gml && creature) {
+        gml->onAttackFinished(creature);
+    }
+    Hero* hero = GameResource::getInstance()->hero();
+    hero->onAttackFinished(hero);
+    gml = NULL;
+    creature = NULL;
 }
 
 int Hero::sight()

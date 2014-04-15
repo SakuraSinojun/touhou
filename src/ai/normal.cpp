@@ -21,6 +21,7 @@ void Normal::turn(MapLayer* gml)
     if (dist <= creature()->attackRange()) {
         // if (!gml->currentCreatureAttack(hero))
         //    gml->idle();
+        creature()->attack(hero, gml);
     } else {
         creature()->findPathAndMove(hero->x, hero->y);
     }

@@ -135,5 +135,58 @@ void MapWrapper::refresh()
     }
 }
 
+CCPoint MapWrapper::mapToPoint(CCPoint point)
+{
+    GameMap* gamemap = GameResource::getInstance()->gameMap();
+
+    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+
+    CCPoint center;
+    center.x = origin.x + visibleSize.width / 2;
+    center.y = origin.y + visibleSize.height / 2;
+
+    CCPoint dd;
+    dd.x = (((MAPWIDTH + 1) % 2) / 2.0f) * TILESIZE;
+    dd.y = (((MAPHEIGHT + 1) % 2) / 2.0f) * TILESIZE;
+
+    CCPoint dp;
+    dp = ccpSub(point, ccp(gamemap->centerX, gamemap->centerY));
+    dp.x *= TILESIZE;
+    dp.y *= TILESIZE;
+    
+    CCPoint pt;
+    pt = ccpAdd(center, dp);
+    pt = ccpAdd(pt, dd);
+
+    return pt;
+}
+
+bool MapWrapper::addProjectile(CCNode* prj, CCPoint start, CCPoint end, float duration, ProjectileCallback* fp)
+{
+    if (mProjectile != NULL)
+        return false;
+
+    mProjectile = prj;
+    mProjectileCallback = fp;
+    this->addChild(prj);
+    prj->setPosition(mapToPoint(start));
+    CCMoveTo* ct = CCMoveTo::create(duration, mapToPoint(end));
+    CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(MapWrapper::onProjectileMoveFinished));
+    prj->runAction(CCSequence::create(ct, cf, NULL));
+    return true;
+}
+
+void MapWrapper::onProjectileMoveFinished(CCObject* pSender)
+{
+    if (mProjectile)
+        this->removeChild(mProjectile);
+    if (mProjectileCallback)
+        (*mProjectileCallback)();
+    mProjectile = NULL;
+    mProjectileCallback = NULL;
+}
+
+
 
 
