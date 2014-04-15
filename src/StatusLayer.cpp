@@ -1,7 +1,7 @@
 
 
 #include "StatusLayer.h"
-#include "GameScene.h"
+// #include "GameScene.h"
 
 #include "logging.h"
 
@@ -27,8 +27,8 @@ void StatusLayer::registerWithTouchDispatcher()
 void StatusLayer::ccTouchesBegan(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent)
 {
     // RUN_HERE();
-    GameSceneMainLayer* s = (GameSceneMainLayer*)(this->getParent());
-    s->onBackFromStatusLayer();
+    // GameSceneMainLayer* s = (GameSceneMainLayer*)(this->getParent());
+    // s->onBackFromStatusLayer();
 }
 
 void StatusLayer::ccTouchesMoved(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent)
@@ -41,7 +41,7 @@ void StatusLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* even
 
 void StatusLayer::onShow()
 {
-    this->setTouchEnabled(true);
+    // this->setTouchEnabled(true);
 }
 
 

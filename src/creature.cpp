@@ -1,6 +1,7 @@
 
 #include "creature.h"
-#include "GameMapLayer.h"
+#include "MapLayer.h"
+#include "GameResource.h"
 #include "logging.h"
 
 USING_NS_CC;
@@ -104,19 +105,10 @@ int Creature::senseRange()
     return 20;
 }
 
-void Creature::onStartTurn(GameMapLayer* gml)
-{
-    mSpeed = mMaxSpeed;
-}
-
-void Creature::onTurn(GameMapLayer* gml)
+void Creature::onTurn(MapLayer* gml)
 {
     if (mAI)
         mAI->turn(gml);
-}
-
-void Creature::onEndTurn(GameMapLayer* gml)
-{
 }
 
 void Creature::StartWalkingAnimation(int dx, int dy)
@@ -151,6 +143,26 @@ int Creature::addExp(int d)
 int Creature::level()
 {
     return mLevel;
+}
+
+bool Creature::move(int dx, int dy, GameMap* mp)
+{
+    StartWalkingAnimation(dx, dy);
+
+    CCPoint pt = getSprite()->getPosition();
+    pt.x += dx * TILESIZE;
+    pt.y += dy * TILESIZE;
+    CCMoveTo* cth = CCMoveTo::create(HEROMOVEPERIOD, pt);
+    getSprite()->runAction(cth);
+
+    pt = getBar()->getPosition();
+    pt.x += dx * TILESIZE;
+    pt.y += dy * TILESIZE;
+    CCMoveTo* ctb = CCMoveTo::create(HEROMOVEPERIOD, pt);
+    getBar()->runAction(ctb);
+
+    MoveTo(x + dx, y + dy, mp);
+    return true;
 }
 
 

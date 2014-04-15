@@ -1,6 +1,7 @@
 
 #include "HeroCreator.h"
-#include "GameScene.h"
+// #include "GameScene.h"
+#include "PlayingScene.h"
 #include "logging.h"
 
 USING_NS_CC;
@@ -59,7 +60,7 @@ void HeroCreator::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* even
 
 void HeroCreator::onAliceSelected(CCObject* pSender)
 {
-    CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5f, GameScene::scene()));
+    CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5f, PlayingScene::create()));
 }
 
 

@@ -2,10 +2,9 @@
 #pragma once
 
 #include <stdlib.h>
-#include "GameMapLayer.h"
 
+class MapLayer;
 class Creature;
-
 namespace ai {
 
 class AI
@@ -18,7 +17,7 @@ public:
     void attach(Creature* c) { mCreature = c; }
     Creature* creature() { return mCreature; }
 
-    virtual void turn(GameMapLayer* gml) = 0;
+    virtual void turn(MapLayer* gml) = 0;
 
 private:
     Creature* mCreature;

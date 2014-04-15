@@ -177,7 +177,7 @@ void MapGeneratorRoom::makeRoom(int x, int y, int w, int h)
             n->blocksight = false;
             n->isWall = false;
 
-            // monsters spawn
+            // TODO: monsters spawn
             if (i != 0 || j != 0) {
                 int d = rand() % 100;
                 if (d < 1 && n->creature == NULL) {

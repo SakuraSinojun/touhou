@@ -8,14 +8,15 @@ public:
     Hero();
     virtual ~Hero();
 
-    static Hero* getInstance();
     static void destroyHero();
 
     virtual int attackRange() { return 5; }
 
+    /*
     virtual void onStartTurn(GameMapLayer* gml);
     virtual void onTurn(GameMapLayer* gml);
     virtual void onEndTurn(GameMapLayer* gml);
+    */
 
     virtual void StartWalkingAnimation(int dx, int dy);
     virtual void StopWalkingAnimation();

@@ -29,7 +29,6 @@ bool GameOverLayer::init()
 
 void GameOverLayer::onMenuGameOver(CCObject* pSender)
 {
-    Hero::destroyHero();
     CCDirector::sharedDirector()->replaceScene(CCTransitionCrossFade::create(0.3f, MainScene::scene()));
 }
 

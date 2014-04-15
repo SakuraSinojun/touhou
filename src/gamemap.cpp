@@ -409,9 +409,9 @@ bool GameMap::findPathTo(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
     Pt  pt(x0, y0, x1, y1);
     OpenTable.push_back(pt);
 
-    int index = 0;
+    int count = 0;
     while (!OpenTable.empty()) {
-        index++;
+        count++;
         Pt pt = OpenTable.front();
         if (pt.x == x1 && pt.y == y1) {
             ClosedTable.push_back(pt);
@@ -420,64 +420,89 @@ bool GameMap::findPathTo(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
 
         OpenTable.pop_front();
 
-        if (index > 500)
+        if (count > 500)
             return false;
 
-        int x, y;
-        for (x = pt.x - 1; x <= pt.x + 1; x++) {
-            for (y = pt.y - 1; y <= pt.y + 1; y++) {
-                if (x == pt.x && y == pt.y)
-                    continue;
+        for (int index = 0; index < 8; index++) {
+            // 是否走斜线
+            if (index > 3)
+                break;
+            int x, y;
+            x = pt.x;
+            y = pt.y;
+            if (index == 0) {
+                x = (x1 > x0) ? pt.x + 1 : pt.x - 1;
+            } else if (index == 1) {
+                y = (y1 > y0) ? pt.y + 1 : pt.y - 1;
+            } else if (index == 2) {
+                x = (x1 > x0) ? pt.x - 1 : pt.x + 1;
+            } else if (index == 3) {
+                y = (y1 > y0) ? pt.y - 1 : pt.y + 1;
+            } else if (index == 4) {
+                x = (x1 > x0) ? pt.x + 1 : pt.x - 1;
+                y = (y1 > y0) ? pt.y + 1 : pt.y - 1;
+            } else if (index == 5) {
+                x = (x1 > x0) ? pt.x + 1 : pt.x - 1;
+                y = (y1 > y0) ? pt.y - 1 : pt.y + 1;
+            } else if (index == 6) {
+                x = (x1 > x0) ? pt.x - 1 : pt.x + 1;
+                y = (y1 > y0) ? pt.y - 1 : pt.y + 1;
+            } else if (index == 7) {
+                x = (x1 > x0) ? pt.x - 1 : pt.x + 1;
+                y = (y1 > y0) ? pt.y + 1 : pt.y - 1;
+            }
 
-                // 是否走斜线
-                if (x != pt.x && y != pt.y)
-                    continue;
+            if (x == pt.x && y == pt.y)
+                continue;
 
-                Node* n = at(x, y);
-                if (!n->canpass) {
+            // 是否走斜线
+            if (x != pt.x && y != pt.y)
+                continue;
+
+            Node* n = at(x, y);
+            if (!n->canpass) {
+                continue;
+            }
+            if (n->creature != NULL) {
+                if (!(x == x1 && y == y1)) {
                     continue;
                 }
-                if (n->creature != NULL) {
-                    if (!(x == x1 && y == y1)) {
-                        continue;
-                    }
+            }
+
+            // 是否走到阴影里
+            /*
+               Node* st = at(x0, y0);
+               if (!isNodeCanBeSeen(n, st))
+               continue;
+               */
+
+
+            Pt p0(x, y, x1, y1);
+            if (std::find(ClosedTable.begin(), ClosedTable.end(), p0) != ClosedTable.end())
+                continue;
+            if (pt.x == x || pt.y == y) {
+                p0.g = 1.0f;
+            } else {
+                p0.g = 1.4f;
+            }
+            p0.parentX = pt.x;
+            p0.parentY = pt.y;
+            std::list<Pt>::iterator it = std::find(OpenTable.begin(), OpenTable.end(), p0);
+            if (it != OpenTable.end()) {
+                if (p0.g + p0.h < (*it).g + (*it).h) {
+                    (*it) = p0;
                 }
-
-                // 是否走到阴影里
-                /*
-                Node* st = at(x0, y0);
-                if (!isNodeCanBeSeen(n, st))
-                    continue;
-                */
-
-
-                Pt p0(x, y, x1, y1);
-                if (std::find(ClosedTable.begin(), ClosedTable.end(), p0) != ClosedTable.end())
-                    continue;
-                if (pt.x == x || pt.y == y) {
-                    p0.g = 1.0f;
+            } else {
+                // insert
+                if (OpenTable.size() == 0) {
+                    OpenTable.push_back(p0);
                 } else {
-                    p0.g = 1.4f;
-                }
-                p0.parentX = pt.x;
-                p0.parentY = pt.y;
-                std::list<Pt>::iterator it = std::find(OpenTable.begin(), OpenTable.end(), p0);
-                if (it != OpenTable.end()) {
-                    if (p0.g + p0.h < (*it).g + (*it).h) {
-                        (*it) = p0;
-                    }
-                } else {
-                    // insert
-                    if (OpenTable.size() == 0) {
-                        OpenTable.push_back(p0);
-                    } else {
-                        std::list<Pt>::iterator it = OpenTable.begin();
+                    std::list<Pt>::iterator it = OpenTable.begin();
+                    it++;
+                    while (it != OpenTable.end() && ((*it).g + (*it).h < p0.g + p0.h)) {
                         it++;
-                        while (it != OpenTable.end() && ((*it).g + (*it).h < p0.g + p0.h)) {
-                            it++;
-                        }
-                        OpenTable.insert(it, p0);
                     }
+                    OpenTable.insert(it, p0);
                 }
             }
         }

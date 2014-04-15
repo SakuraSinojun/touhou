@@ -1,0 +1,26 @@
+
+Scene: MainScene: 
+    |
+    +---- play / setup
+
+
+Scene: HeroCreatorScene:
+
+
+Scene: PlayingScene:
+    |
+    +---- Layer: MainLayer
+            |
+            +---- Menu: Menus
+            |
+            +---- Layer: inventory and status
+            |
+            +---- Layer: MapLayer
+                        |
+                        +---- Layer: MapWrapper
+                                |
+                                +---- Sprite: MapTile
+
+
+Scene: GameOverScene:
+

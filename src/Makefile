@@ -9,8 +9,6 @@ SOURCES = 	main.cpp \
         	AppDelegate.cpp \
         	MainScene.cpp \
         	HeroCreator.cpp \
-        	GameScene.cpp \
-        	GameMapLayer.cpp \
         	MapTile.cpp \
         	gamemap.cpp \
         	dice.cpp \
@@ -21,6 +19,11 @@ SOURCES = 	main.cpp \
         	HpBar.cpp \
         	ai/normal.cpp \
         	GameOverScene.cpp \
+        	PlayingScene.cpp \
+        	MainLayer.cpp \
+        	MapLayer.cpp \
+        	MapWrapper.cpp \
+        	GameResource.cpp \
 
 COCOS_ROOT = /home/kazuki/projects/kazuki/third_party/cocos2d-x-2.2.2
 include $(COCOS_ROOT)/cocos2dx/proj.linux/cocos2dx.mk

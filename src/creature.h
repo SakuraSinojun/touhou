@@ -9,7 +9,7 @@
 #include "ai/ai.h"
 #include "common/weak_ptr.h"
 
-class GameMapLayer;
+class MapLayer;
 class Creature : public SupportsWeakPtr<Creature>
 {
 public:
@@ -40,18 +40,14 @@ public:
             x = x_;
             y = y_;
             mp->at(x, y)->creature = this;
-            // if (x == 0 && y == 0) RUN_HERE() << "(" << x << ", " << y << ") " << mp->at(x, y)->creature;
-            // RUN_HERE() << "(" << x << ", " << y << ") " << mp->at(x, y)->creature;
         }
     }
     void MoveTo(int x_, int y_, GameMap& mp) {
         MoveTo(x_, y_, &mp);
     }
 
-    bool move(int dx, int dy, GameMap* mp) {
-        MoveTo(x + dx, y + dy, mp);
-        return true;
-    }
+    bool move(int dx, int dy, GameMap* mp);
+
     int x;
     int y;
 
@@ -77,9 +73,7 @@ public:
     int level();
 
     // 
-    virtual void onStartTurn(GameMapLayer* gml);
-    virtual void onTurn(GameMapLayer* gml);
-    virtual void onEndTurn(GameMapLayer* gml);
+    virtual void onTurn(MapLayer* gml);
 
 protected:
     cocos2d::CCSprite*  mSprite;

@@ -1,6 +1,7 @@
 
 #include "MainScene.h"
 #include "HeroCreator.h"
+#include "PlayingScene.h"
 #include "logging.h"
 
 USING_NS_CC;
@@ -57,12 +58,14 @@ void MainScene::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
 
 void MainScene::onPlayButtonClicked(CCObject* pSender)
 {
-    CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5f, HeroCreator::scene()));
+    // CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5f, HeroCreator::scene()));
+    CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5f, PlayingScene::create()));
 }
 
 void MainScene::onSetupButtonClicked(CCObject* pSender)
 {
-    CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5f, HeroCreator::scene()));
+    // CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5f, HeroCreator::scene()));
+    CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5f, PlayingScene::create()));
 }
 
 

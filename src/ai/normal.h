@@ -12,7 +12,7 @@ public:
     Normal(Creature* c) : AI(c) {}
     virtual ~Normal() {}
 
-    virtual void turn(GameMapLayer* gml);
+    virtual void turn(MapLayer* gml);
 };
 
 } // namespace ai;

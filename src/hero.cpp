@@ -6,22 +6,6 @@
 #include "cocos2d.h"
 USING_NS_CC;
 
-static Hero* g_hero;
-
-Hero* Hero::getInstance()
-{
-    if (!g_hero)
-        g_hero = new Hero();
-    return g_hero;
-}
-
-void Hero::destroyHero()
-{
-    if (g_hero)
-        delete g_hero;
-    g_hero = NULL;
-}
-
 Hero::Hero()
     : Creature()
 {
@@ -37,6 +21,7 @@ Hero::~Hero()
 {
 }
 
+/*
 void Hero::onStartTurn(GameMapLayer* gml)
 {
     Creature::onStartTurn(gml);
@@ -60,6 +45,7 @@ void Hero::onEndTurn(GameMapLayer* gml)
     GameScene* s = (GameScene*)gml->getParent();
     s->setTouchEnabled(false);
 }
+*/
 
 void Hero::StartWalkingAnimation(int dx, int dy)
 {
@@ -80,6 +66,7 @@ void Hero::StartWalkingAnimation(int dx, int dy)
 void Hero::StopWalkingAnimation()
 {
     getSprite()->stopAllActions();
+    getBar()->stopAllActions();
 }
 
 int Hero::sight()
