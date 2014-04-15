@@ -13,15 +13,6 @@
 
 USING_NS_CC;
 
-class FpHelper : public GameMap::FpCallbackFunctor {
-public:
-    virtual void operator() (int x, int y) {
-        CCPoint pt(x, y);
-        nodes.push_back(pt);
-    }
-    std::list<CCPoint> nodes;
-};
-
 bool MapLayer::init()
 {
     if (!CCLayer::init())
@@ -50,11 +41,24 @@ void MapLayer::registerWithTouchDispatcher()
 void MapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
 {
     CCTouch* touch = (CCTouch*)(touches->anyObject());
+    Hero* hero = GameResource::getInstance()->hero();
+    GameMap* gamemap = GameResource::getInstance()->gameMap();
+
     CCPoint pt = touch->getLocation();
     mDestPoint = pointToMap(pt);
-    mMapWrapper->mGridPosition = mDestPoint;
-    mMapWrapper->showGrid(true);
-    startMoving();
+
+    // TODO: touch self
+    if (mDestPoint.x == hero->x && mDestPoint.y == hero->y)
+        return;
+
+    Creature* creature = gamemap->at(mDestPoint.x, mDestPoint.y)->creature;
+    if (creature != NULL) {
+        RUN_HERE();
+    } else {
+        mMapWrapper->mGridPosition = mDestPoint;
+        mMapWrapper->showGrid(true);
+        startMoving();
+    }
 }
 
 void MapLayer::startMoving()
@@ -204,27 +208,6 @@ void MapLayer::addActiveCreature(Creature* c)
     if (it == mActiveCreatures.end())
         mActiveCreatures.push_back(c);
 }
-
-bool MapLayer::moveCreature(Creature* c, cocos2d::CCPoint dest)
-{
-    Hero* hero = GameResource::getInstance()->hero();
-    GameMap* gamemap = GameResource::getInstance()->gameMap();
-
-    FpHelper    ch;
-    if (!gamemap->findPathTo(c->x, c->y, hero->x, hero->y, ch)) {
-        return false;
-    }
-    ch.nodes.pop_front();
-    CCPoint direction = ccpSub(ch.nodes.front(), ccp(c->x, c->y));
-    if (direction.x == 0 && direction.y == 0) {
-        FATAL() << "cannot runhere.";
-        return false;
-    }
-
-    c->move(direction.x, direction.y, gamemap);
-    return true;
-}
-
 
 
 

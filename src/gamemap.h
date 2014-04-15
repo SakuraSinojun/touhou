@@ -3,8 +3,9 @@
 
 
 #include <map>
+#include <list>
 #include <stdlib.h>
-
+#include "cocos2d.h"
 
 #define CHUNKWIDTH  16
 #define CHUNKHEIGHT CHUNKWIDTH
@@ -175,6 +176,15 @@ public:
     int lastX;
     int lastY;
     bool isFirstRoomGenerated;
+};
+
+class FpHelper : public GameMap::FpCallbackFunctor {
+public:
+    virtual void operator() (int x, int y) {
+        cocos2d::CCPoint pt(x, y); 
+        nodes.push_back(pt);
+    }   
+    std::list<cocos2d::CCPoint> nodes;
 };
 
 

@@ -32,6 +32,11 @@ public:
     virtual void StartWalkingAnimation(int dx, int dy);
     virtual void StopWalkingAnimation();
 
+    virtual bool findPathAndMove(int dx, int dy);
+    virtual bool move(int dx, int dy, GameMap* mp);
+    virtual bool attack(Creature& o);
+    virtual bool attack(Creature* o);
+
 public:
     // moving
     void MoveTo(int x_, int y_, GameMap* mp) {
@@ -46,8 +51,6 @@ public:
         MoveTo(x_, y_, &mp);
     }
 
-    bool move(int dx, int dy, GameMap* mp);
-
     int x;
     int y;
 
@@ -57,8 +60,6 @@ public:
     virtual int maxHp();
     virtual int attackRange();
 
-    virtual Creature& attack(Creature& o);
-    virtual Creature& attack(Creature* o);
 
     int& speed() { return mSpeed; }
     void resetSpeed() { mSpeed = mMaxSpeed; }

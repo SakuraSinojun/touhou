@@ -22,7 +22,7 @@ void Normal::turn(MapLayer* gml)
         // if (!gml->currentCreatureAttack(hero))
         //    gml->idle();
     } else {
-        gml->moveCreature(creature(), ccp(hero->x, hero->y));
+        creature()->findPathAndMove(hero->x, hero->y);
     }
 }
 

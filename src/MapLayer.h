@@ -12,7 +12,8 @@ public:
     CREATE_FUNC(MapLayer);
     virtual bool init();
 
-    bool moveCreature(Creature* c, cocos2d::CCPoint dest);
+    // bool moveCreature(Creature* c, cocos2d::CCPoint dest);
+    // bool attackCreature(Creature* c1, Creature* c2);
 
 private:
     MapWrapper*         mMapWrapper;

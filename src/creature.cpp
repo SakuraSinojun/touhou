@@ -79,20 +79,20 @@ int Creature::attackRange()
     return 1;
 }
 
-Creature& Creature::attack(Creature& o)
+bool Creature::attack(Creature& o)
 {
     o.mCurrentHP -= 3;
     if (o.mCurrentHP <= 0)
         o.mCurrentHP = 0;
     o.mHpBar->setPercent((float)o.mCurrentHP / o.maxHp());
-    return *this;
+    return true;
 }
 
-Creature& Creature::attack(Creature* o)
+bool Creature::attack(Creature* o)
 {
     if (o)
-        attack(*o);
-    return *this;
+        return attack(*o);
+    return false;
 }
 
 int Creature::sight()
@@ -165,5 +165,22 @@ bool Creature::move(int dx, int dy, GameMap* mp)
     return true;
 }
 
+bool Creature::findPathAndMove(int dx, int dy)
+{
+    GameMap* gamemap = GameResource::getInstance()->gameMap();
+    FpHelper    ch; 
+    if (!gamemap->findPathTo(x, y, dx, dy, ch)) {
+        return false;
+    }   
+    ch.nodes.pop_front();
+    CCPoint direction = ccpSub(ch.nodes.front(), ccp(x, y));
+    if (direction.x == 0 && direction.y == 0) {
+        FATAL() << "cannot runhere.";
+        return false;
+    }   
+
+    move(direction.x, direction.y, gamemap);
+    return true;
+}
 
 
