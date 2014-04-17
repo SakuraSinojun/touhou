@@ -18,6 +18,7 @@ SOURCES = 	main.cpp \
         	mapgenerator_room.cpp \
         	HpBar.cpp \
         	ai/normal.cpp \
+        	monsters/monster.cpp \
         	GameOverScene.cpp \
         	PlayingScene.cpp \
         	MainLayer.cpp \

@@ -18,6 +18,7 @@ Creature::Creature()
     , mMaxSpeed(5)
     , mSpeed(5)
     , mLevel(1)
+    , mProjectileHelper(this)
 {
     mCurrentHP = maxHp();
     mHpBar->getBar()->setTag(g_tag++);
@@ -159,6 +160,7 @@ void Creature::StopWalkingAnimation()
 
 int Creature::expOnDeath()
 {
+    RUN_HERE() << mLevel;
     return mLevel * 10;
 }
 
@@ -169,6 +171,7 @@ int Creature::exp()
 
 int Creature::addExp(int d)
 {
+    RUN_HERE() << d;
     mExp += d;
     int ol = mLevel;
     mLevel = mExp / 20 + 1;
@@ -221,4 +224,16 @@ bool Creature::findPathAndMove(int dx, int dy)
     return true;
 }
 
+bool Creature::fireBall(Creature&o, MapLayer* gml)
+{
+    CCParticleMeteor* pm = CCParticleMeteor::create();
+    pm->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fireball.png"));
+    pm->setScale(0.2f);
+
+    mProjectileHelper.set(this);
+    float dist = GameResource::getInstance()->gameMap()->calcDistance(x, y, o.x, o.y);
+    if (!gml->wrapper()->addProjectile(pm, ccp(x, y), ccp(o.x, o.y), dist * PROJECTILESPEED, &mProjectileHelper))
+        return false;
+    return true;
+}
 

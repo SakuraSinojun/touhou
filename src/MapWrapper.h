@@ -4,11 +4,20 @@
 #include "cocos2d.h"
 #include "MapTile.h"
 #include "GameResource.h"
+#include "logging.h"
 
+class Creature;
 class ProjectileCallback
 {
 public:
-    virtual void operator()() = 0;
+    ProjectileCallback() : mCreature(NULL) {}
+    ProjectileCallback(Creature* c) : mCreature(c) {}
+    virtual ~ProjectileCallback() {}
+
+    void set(Creature* c) { mCreature = c; }
+    virtual void operator()();
+protected:
+    Creature*   mCreature;
 };
 
 class MapWrapper : public cocos2d::CCLayer

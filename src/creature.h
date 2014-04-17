@@ -5,6 +5,7 @@
 #include "gamemap.h"
 #include "logging.h"
 #include "HpBar.h"
+#include "MapWrapper.h"
 
 #include "ai/ai.h"
 #include "common/weak_ptr.h"
@@ -39,6 +40,9 @@ public:
     virtual bool attackAnimate(Creature& o, MapLayer* gml);
 
     virtual void onAttackFinished(cocos2d::CCObject* pSender);
+
+protected:
+    virtual bool fireBall(Creature&o, MapLayer* gml);
 
 public:
     // moving
@@ -92,5 +96,7 @@ protected:
     int mSpeed;
     int mLevel;
     int mExp;
+
+    ProjectileCallback mProjectileHelper;
 };
 

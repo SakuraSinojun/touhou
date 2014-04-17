@@ -6,5 +6,6 @@
 class Monster : public Creature
 {
 public:
+    static Monster* create();
 };
 

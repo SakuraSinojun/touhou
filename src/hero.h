@@ -2,11 +2,9 @@
 #pragma once
 
 #include "creature.h"
-#include "MapWrapper.h"
 
 class Hero : public Creature
-{
-public:
+{ public:
     Hero();
     virtual ~Hero();
 
@@ -29,13 +27,5 @@ public:
 
     virtual int maxHp();
 
-private:
-    class ProjectileHelper : public ProjectileCallback {
-    public:
-        virtual void operator()();
-        MapLayer* gml;
-        Creature* creature;
-    };
-    ProjectileHelper    mProjectileHelper;
 };
 

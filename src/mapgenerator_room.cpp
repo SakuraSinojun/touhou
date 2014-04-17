@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 
-#include "monsters/dark_ghost.h"
+#include "monsters/monster.h"
 
 #include "logging.h"
 
@@ -181,7 +181,7 @@ void MapGeneratorRoom::makeRoom(int x, int y, int w, int h)
             if (i != 0 || j != 0) {
                 int d = rand() % 100;
                 if (d < 1 && n->creature == NULL) {
-                    DarkGhost* dg = new DarkGhost();
+                    Monster* dg = Monster::create();
                     dg->x = i;
                     dg->y = j;
                     dg->MoveTo(i, j, mGameMap); 

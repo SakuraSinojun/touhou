@@ -2,10 +2,18 @@
 #include "MapWrapper.h"
 #include "GameResource.h"
 #include "gamemap.h"
+#include "creature.h"
 #include "hero.h"
 #include "logging.h"
 
 USING_NS_CC;
+
+void ProjectileCallback::operator()()
+{
+    if (mCreature != NULL) {
+        mCreature->onAttackFinished(NULL);
+    }
+}
 
 bool MapWrapper::init()
 {
@@ -114,7 +122,7 @@ void MapWrapper::refresh()
                 CCSprite* b = n->creature->getBar();
                 if (s != NULL) {
                     s->setPosition(ccp(cx, cy));
-                    b->setPosition(ccp(cx, cy + TILESIZE));
+                    b->setPosition(ccp(cx, cy + TILESIZEF / 2.0f));
                     s->setVisible(tiles[i][j]->isVisible());
                     b->setVisible(tiles[i][j]->isVisible());
 
