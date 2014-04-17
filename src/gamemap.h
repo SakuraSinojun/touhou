@@ -153,6 +153,8 @@ public:
     // 不包含(x1, y1)
     bool findPathTo(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp);
 
+    bool findPath1Step(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp);
+
     bool isNodeCanBeSeen(Node* n, Node* from);
     float calcDistance(Node* n1, Node* n2);
     float calcDistance(int x0, int y0, int x1, int y1);

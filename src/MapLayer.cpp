@@ -111,9 +111,17 @@ bool MapLayer::moveBy1Grid()
     if (mDestPoint.x != hero->x || mDestPoint.y != hero->y) {
         FpHelper    ch;
         if (!gamemap->findPath(hero->x, hero->y, mDestPoint.x, mDestPoint.y, ch)) {
-            return false;
+            ch.nodes.clear();
+            if (!gamemap->findPath1Step(hero->x, hero->y, mDestPoint.x, mDestPoint.y, ch)) {
+                return false;
+            }
         }
+        if (ch.nodes.empty())
+            return false;
         ch.nodes.pop_front();
+        if (ch.nodes.empty())
+            return false;
+
         CCPoint direction = ccpSub(ch.nodes.front(), ccp(hero->x, hero->y));
         if (direction.x == 0 && direction.y == 0) {
             FATAL() << "cannot runhere.";

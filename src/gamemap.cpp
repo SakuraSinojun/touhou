@@ -545,5 +545,27 @@ bool GameMap::findPath(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
     return false;
 }
 
+bool GameMap::findPath1Step(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
+{
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    Node* node = NULL;
+    if (abs(dx) > abs(dy) && dx != 0) {
+        dx = x0 + dx / abs(dx);
+        dy = y0;
+    } else if (dy != 0) {
+        dx = x0;
+        dy = y0 + dy / abs(dy);
+    } else {
+        return false;
+    }
+    node = at(dx, dy);
+    if (node->creature == NULL && node->canpass) {
+        fp(x0, y0);
+        fp(dx, dy);
+        return true;
+    }
+    return false;
+}
 
 
