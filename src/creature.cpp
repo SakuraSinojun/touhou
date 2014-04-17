@@ -18,6 +18,7 @@ Creature::Creature()
     , mMaxSpeed(5)
     , mSpeed(5)
     , mLevel(1)
+    , mExp(0)
     , mProjectileHelper(this)
 {
     mCurrentHP = maxHp();
@@ -160,7 +161,6 @@ void Creature::StopWalkingAnimation()
 
 int Creature::expOnDeath()
 {
-    RUN_HERE() << mLevel;
     return mLevel * 10;
 }
 
@@ -171,7 +171,6 @@ int Creature::exp()
 
 int Creature::addExp(int d)
 {
-    RUN_HERE() << d;
     mExp += d;
     int ol = mLevel;
     mLevel = mExp / 20 + 1;

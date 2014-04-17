@@ -18,6 +18,7 @@ Hero::Hero()
     // anchor.y -= 16.0f / 48.0f;
     // getSprite()->setAnchorPoint(anchor);
     this->mCurrentHP = maxHp();
+    mName = "hero";
     // mProjectileHelper.setAttacker(this);
 }
 
@@ -90,7 +91,8 @@ int Hero::senseRange()
 
 int Hero::maxHp()
 {
-    return 30 * level();
+    int hp = 30 * level();
+    return hp;
 }
 
 

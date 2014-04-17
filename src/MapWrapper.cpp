@@ -172,27 +172,23 @@ CCPoint MapWrapper::mapToPoint(CCPoint point)
 
 bool MapWrapper::addProjectile(CCNode* prj, CCPoint start, CCPoint end, float duration, ProjectileCallback* fp)
 {
-    if (mProjectile != NULL)
-        return false;
+    Projectile * pj = new Projectile(prj, fp);
 
-    mProjectile = prj;
-    mProjectileCallback = fp;
     this->addChild(prj);
     prj->setPosition(mapToPoint(start));
     CCMoveTo* ct = CCMoveTo::create(duration, mapToPoint(end));
-    CCCallFuncN* cf = CCCallFuncN::create(this, callfuncN_selector(MapWrapper::onProjectileMoveFinished));
+    CCCallFuncND* cf = CCCallFuncND::create(this, callfuncND_selector(MapWrapper::onProjectileMoveFinished), pj);
     prj->runAction(CCSequence::create(ct, cf, NULL));
     return true;
 }
 
-void MapWrapper::onProjectileMoveFinished(CCObject* pSender)
+void MapWrapper::onProjectileMoveFinished(cocos2d::CCNode* pSender, void* data)
 {
-    if (mProjectile)
-        this->removeChild(mProjectile);
-    if (mProjectileCallback)
-        (*mProjectileCallback)();
-    mProjectile = NULL;
-    mProjectileCallback = NULL;
+    Projectile * pj = (Projectile*)data;
+    if (pj->mProjectile)
+        this->removeChild(pj->mProjectile);
+    if (pj->mProjectileCallback)
+        (*pj->mProjectileCallback)();
 }
 
 

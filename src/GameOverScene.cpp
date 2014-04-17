@@ -1,7 +1,7 @@
 
 #include "GameOverScene.h"
 #include "MainScene.h"
-#include "hero.h"
+#include "GameResource.h"
 
 USING_NS_CC;
 
@@ -29,6 +29,7 @@ bool GameOverLayer::init()
 
 void GameOverLayer::onMenuGameOver(CCObject* pSender)
 {
+    GameResource::getInstance()->reset();
     CCDirector::sharedDirector()->replaceScene(CCTransitionCrossFade::create(0.3f, MainScene::scene()));
 }
 

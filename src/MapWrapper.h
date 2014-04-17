@@ -41,9 +41,15 @@ private:
     MapTile*                tiles[MAPWIDTH][MAPHEIGHT];
     cocos2d::CCSprite*      mGrid;
     bool                    mIsGridVisible;
-    cocos2d::CCNode*        mProjectile;
-    ProjectileCallback*     mProjectileCallback;
-    void onProjectileMoveFinished(cocos2d::CCObject* pSender);
+    void onProjectileMoveFinished(cocos2d::CCNode* pSender, void* data);
+    class Projectile {
+    public:
+        Projectile() : mProjectile(NULL), mProjectileCallback(NULL) {}
+        Projectile(cocos2d::CCNode* p, ProjectileCallback* cb) : mProjectile(p), mProjectileCallback(cb) {}
+        cocos2d::CCNode*        mProjectile;
+        ProjectileCallback*     mProjectileCallback;
+    };
+
 };
 
 

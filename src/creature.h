@@ -9,6 +9,7 @@
 
 #include "ai/ai.h"
 #include "common/weak_ptr.h"
+#include <string>
 
 class MapLayer;
 class Creature : public SupportsWeakPtr<Creature>, public cocos2d::CCObject
@@ -40,6 +41,7 @@ public:
     virtual bool attackAnimate(Creature& o, MapLayer* gml);
 
     virtual void onAttackFinished(cocos2d::CCObject* pSender);
+    std::string name() { return mName; }
 
 protected:
     virtual bool fireBall(Creature&o, MapLayer* gml);
@@ -88,6 +90,7 @@ protected:
     HpBar*              mHpBar;
     MapLayer*           mMapLayer;
     Creature*           mTarget;
+    std::string         mName;
 
     int mCurrentHP;
     

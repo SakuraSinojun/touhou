@@ -12,6 +12,7 @@ public:
         cocos2d::CCRect  rect(0, 0, 32, 48);
         createSprite("monsters/redwiz.png", rect);
         getSprite()->setScale(32.0f / 48.0f);
+        mName = "RedWiz";
         mAI = new ai::Normal(this);
     }
     virtual ~RedWiz() {
