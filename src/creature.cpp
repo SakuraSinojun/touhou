@@ -112,7 +112,7 @@ void Creature::onAttackFinished(CCObject* pSender)
             mTarget->mCurrentHP = 0;
         mTarget->mHpBar->setPercent((float)mTarget->currentHp() / mTarget->maxHp());
     }
-    mMapLayer->onAttackFinished(mTarget);
+    mMapLayer->onAttackFinished(this, mTarget);
     mTarget = NULL;
 }
 

@@ -87,9 +87,12 @@ bool Hero::attackAnimate(Creature& o, MapLayer* gml)
 
 void Hero::ProjectileHelper::operator()()
 {
+    /*
     if (gml && creature) {
-        gml->onAttackFinished(creature);
+        RUN_HERE();
+        gml->onAttackFinished(hero, creature);
     }
+    */
     Hero* hero = GameResource::getInstance()->hero();
     hero->onAttackFinished(hero);
     gml = NULL;

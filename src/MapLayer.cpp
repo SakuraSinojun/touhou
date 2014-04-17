@@ -60,7 +60,7 @@ void MapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
     if (creature != NULL) {
         if (gamemap->calcDistance(creature->x, creature->y, hero->x, hero->y) <= hero->attackRange()) {
             if (!startAttacking(creature)) {
-                onAttackFinished(creature);
+                onAttackFinished(hero, creature);
             }
         }
     } else {
@@ -78,18 +78,21 @@ bool MapLayer::startAttacking(Creature* c)
     Hero* hero = GameResource::getInstance()->hero();
     if (!hero->attack(c, this))
         return false;
-    onTurn();
+    // onTurn();
     return true;
 }
 
-void MapLayer::onAttackFinished(Creature* c)
+void MapLayer::onAttackFinished(Creature* attacker, Creature* c)
 {
     mIsAttacking = false;
     if (c == NULL)
         return;
-    Hero* hero = GameResource::getInstance()->hero();
     if (c->currentHp() <= 0) {
-        onCreatureDie(c, hero);
+        onCreatureDie(c, attacker);
+    }
+    Hero* hero = GameResource::getInstance()->hero();
+    if (hero == attacker) {
+        onTurn();
     }
 }
 

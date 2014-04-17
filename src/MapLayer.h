@@ -13,7 +13,7 @@ public:
     virtual bool init();
 
     MapWrapper*     wrapper() { return mMapWrapper; }
-    void    onAttackFinished(Creature* c);
+    void    onAttackFinished(Creature* attacker, Creature* c);
 
 private:
     MapWrapper*         mMapWrapper;
@@ -22,6 +22,7 @@ private:
     bool                mIsAttacking;
     std::list<Creature*>    mActiveCreatures;
     std::list<cocos2d::CCPoint> mHeroPath;
+    Creature*           mAttacker;
 
     void registerWithTouchDispatcher();
     void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
