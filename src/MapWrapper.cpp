@@ -132,6 +132,16 @@ void MapWrapper::refresh()
                     }
                 }
             }
+            if (n->ornament != NULL) {
+                CCSprite* s = n->ornament->Sprite();
+                if (s != NULL) {
+                    s->setPosition(ccp(cx, cy));
+                    s->setVisible(tiles[i][j]->isVisible());
+                    if (this->getChildByTag(s->getTag()) == NULL) {
+                        this->addChild(s, 10);
+                    }
+                }
+            }
         }
     }
     if (mGridPosition.x > sx && mGridPosition.x < sx + MAPWIDTH && mGridPosition.y > sy && mGridPosition.y < sy + MAPHEIGHT) {

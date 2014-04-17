@@ -6,6 +6,7 @@
 #include <list>
 #include <stdlib.h>
 #include "cocos2d.h"
+#include "ornaments/ornament.h"
 
 #define CHUNKWIDTH  16
 #define CHUNKHEIGHT CHUNKWIDTH
@@ -37,8 +38,6 @@ public:
     public:
         Node()
             : type(NODE_GRASS)
-            , blocksight(false)
-            , canpass(true)
             , x(0)
             , y(0)
             , creature(NULL)
@@ -46,11 +45,28 @@ public:
             , hasConsidered(false)
             , biome(BIOME_FOREST)
             , explored(false)
+            , ornament(NULL)
+            , blocksight(false)
+            , canpass(true)
         {}
         ~Node() {}
         NODETYPE type;
-        bool blocksight;
-        bool canpass;
+        bool isBlockSight() {
+            if (blocksight)
+                return true;
+            if (ornament != NULL)
+                return ornament->blocksight;
+            return false;
+        }
+
+        bool canPass() {
+            if (!canpass)
+                return false;
+            if (ornament != NULL)
+                return ornament->canpass;
+            return true;
+        }
+
         int x;
         int y;
         Creature* creature;
@@ -58,6 +74,9 @@ public:
         bool hasConsidered;
         BIOME   biome;
         bool explored;
+        Ornament* ornament;
+        bool blocksight;
+        bool canpass;
     };
 
     class ChunkId {

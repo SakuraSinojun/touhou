@@ -19,6 +19,7 @@ SOURCES = 	main.cpp \
         	HpBar.cpp \
         	ai/normal.cpp \
         	monsters/monster.cpp \
+        	ornaments/ornament.cpp \
         	GameOverScene.cpp \
         	PlayingScene.cpp \
         	MainLayer.cpp \

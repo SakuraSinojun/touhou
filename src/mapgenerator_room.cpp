@@ -6,6 +6,7 @@
 #include <map>
 
 #include "monsters/monster.h"
+#include "ornaments/ornament.h"
 
 #include "logging.h"
 
@@ -185,6 +186,9 @@ void MapGeneratorRoom::makeRoom(int x, int y, int w, int h)
                     dg->x = i;
                     dg->y = j;
                     dg->MoveTo(i, j, mGameMap); 
+                }
+                if (n->creature == NULL) {
+                    n->ornament = Ornament::create();
                 }
             }
         }

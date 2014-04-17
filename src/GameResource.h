@@ -23,11 +23,14 @@ public:
     CTACTION getAction() { return mAction; }
     void setAction(CTACTION act) { mAction = act; }
 
+    static int nextTag() { return mTag++; }
+
 private:
     GameResource();
     Hero*       mHero;
     GameMap*    mGameMap;
     CTACTION    mAction;
+    static int  mTag;
 };
 
 #define TILESIZE    32

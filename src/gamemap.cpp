@@ -347,7 +347,7 @@ bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
         int step = dy / abs(dy);
         for (int y = from->y + step; y != n->y; y += step) {
             Node* nd = at(n->x, y);
-            if (nd->blocksight)
+            if (nd->isBlockSight())
                 return false;
         }
         return true;
@@ -357,7 +357,7 @@ bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
         int step = dx / abs(dx);
         for (int x = from->x + step; x != n->x; x += step) {
             Node* nd = at(x, n->y);
-            if (nd->blocksight)
+            if (nd->isBlockSight())
                 return false;
         }
         return true;
@@ -460,7 +460,7 @@ bool GameMap::findPathTo(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
                 continue;
 
             Node* n = at(x, y);
-            if (!n->canpass) {
+            if (!n->canPass()) {
                 continue;
             }
             if (n->creature != NULL) {
@@ -560,7 +560,7 @@ bool GameMap::findPath1Step(int x0, int y0, int x1, int y1, FpCallbackFunctor& f
         return false;
     }
     node = at(dx, dy);
-    if (node->creature == NULL && node->canpass) {
+    if (node->creature == NULL && node->canPass()) {
         fp(x0, y0);
         fp(dx, dy);
         return true;

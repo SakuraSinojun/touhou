@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 static GameResource* m_resources = NULL;
+int GameResource::mTag = 1000;
 
 GameResource::GameResource()
     : mHero(NULL)
@@ -14,6 +15,7 @@ GameResource::GameResource()
     , mAction(CT_MOVE)
 {
     srand(0);
+    mTag = 1000;
     mHero = new Hero();
     mGameMap = new GameMap();
 }

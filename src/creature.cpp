@@ -6,9 +6,6 @@
 
 USING_NS_CC;
 
-// 放到某个类里去以便回到初始化状态。
-static int g_tag = 1000;
-
 Creature::Creature()
     : mSprite(NULL)
     , mHpBar(new HpBar())
@@ -22,7 +19,7 @@ Creature::Creature()
     , mProjectileHelper(this)
 {
     mCurrentHP = maxHp();
-    mHpBar->getBar()->setTag(g_tag++);
+    mHpBar->getBar()->setTag(GameResource::nextTag());
 }
 
 Creature::~Creature()
@@ -48,7 +45,7 @@ CCSprite* Creature::getSprite()
 cocos2d::CCSprite* Creature::createSprite()
 {
     mSprite = new CCSprite();
-    mSprite->setTag(g_tag++);
+    mSprite->setTag(GameResource::nextTag());
     return mSprite;
 }
 
@@ -56,7 +53,7 @@ cocos2d::CCSprite* Creature::createSprite(const char* file)
 {
     mSprite = new CCSprite();
     mSprite->initWithFile(file);
-    mSprite->setTag(g_tag++);
+    mSprite->setTag(GameResource::nextTag());
     return mSprite;
 }
 
@@ -64,7 +61,7 @@ cocos2d::CCSprite* Creature::createSprite(const char * file, cocos2d::CCRect& re
 {
     mSprite = new CCSprite();
     mSprite->initWithFile(file, rect);
-    mSprite->setTag(g_tag++);
+    mSprite->setTag(GameResource::nextTag());
     return mSprite;
 }
 
