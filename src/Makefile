@@ -21,6 +21,8 @@ SOURCES = 	main.cpp \
         	monsters/monster.cpp \
         	ornaments/ornament.cpp \
         	ornaments/chest.cpp \
+        	ornaments/door.cpp \
+        	items/item.cpp \
         	GameOverScene.cpp \
         	PlayingScene.cpp \
         	MainLayer.cpp \

@@ -385,7 +385,7 @@ bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
         for (x = from->x; x != n->x; x+= sx) {
             y = from->y + (x - from->x) * dy / dx;
             Node* nd = at(x, y);
-            if (nd->blocksight)
+            if (nd->isBlockSight())
                 return false;
         }
     } else {
@@ -393,7 +393,7 @@ bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
         for (y = from->y; y != n->y; y+= sy) {
             x = from->x + (y - from->y) * dx / dy;
             Node* nd = at(x, y);
-            if (nd->blocksight)
+            if (nd->isBlockSight())
                 return false;
         }
     }

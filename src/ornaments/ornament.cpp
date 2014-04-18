@@ -9,6 +9,7 @@ USING_NS_CC;
 Ornament::Ornament()
     : canpass(false)
     , blocksight(true)
+    , mSprite(NULL)
 {
 }
 

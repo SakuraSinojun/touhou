@@ -7,6 +7,7 @@
 
 #include "monsters/monster.h"
 #include "ornaments/ornament.h"
+#include "ornaments/door.h"
 
 #include "logging.h"
 
@@ -165,6 +166,7 @@ void MapGeneratorRoom::makeDoor(int x, int y)
     n->canpass = true;
     n->blocksight = false;
     n->isWall = false;
+    n->ornament = new Door();
 }
 
 void MapGeneratorRoom::makeRoom(int x, int y, int w, int h)

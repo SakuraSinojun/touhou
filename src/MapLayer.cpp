@@ -137,9 +137,11 @@ bool MapLayer::moveBy1Grid()
                     mMapWrapper->refresh();
                 }
                 return false;
-            } else {
+            } else if (gamemap->at(mDestPoint.x, mDestPoint.y)->canPass()) {
                 ch.nodes.push_back(ccp(hero->x, hero->y));
                 ch.nodes.push_back(mDestPoint);
+            } else {
+                return false;
             }
         }
         if (ch.nodes.empty())
