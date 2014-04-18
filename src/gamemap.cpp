@@ -460,7 +460,7 @@ bool GameMap::findPathTo(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp)
                 continue;
 
             Node* n = at(x, y);
-            if (!n->canPass()) {
+            if (!n->canPass() && !(x == x1 && y == y1)) {
                 continue;
             }
             if (n->creature != NULL) {

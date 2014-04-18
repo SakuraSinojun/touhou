@@ -18,6 +18,8 @@ public:
     cocos2d::CCSprite* createSprite(const char* file);
     cocos2d::CCSprite* createSprite(const char * file, cocos2d::CCRect& rect);
 
+    virtual bool active();
+
 protected:
     friend class GameMap;
     bool canpass;

@@ -56,6 +56,11 @@ CCSprite* Ornament::createSprite(const char * file, cocos2d::CCRect& rect)
     return mSprite;
 }
 
+bool Ornament::active()
+{
+    return false;
+}
+
 
 
 

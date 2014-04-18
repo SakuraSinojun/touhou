@@ -20,6 +20,7 @@ SOURCES = 	main.cpp \
         	ai/normal.cpp \
         	monsters/monster.cpp \
         	ornaments/ornament.cpp \
+        	ornaments/chest.cpp \
         	GameOverScene.cpp \
         	PlayingScene.cpp \
         	MainLayer.cpp \

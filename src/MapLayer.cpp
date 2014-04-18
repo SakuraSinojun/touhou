@@ -6,6 +6,7 @@
 #include "GameOverScene.h"
 #include "creature.h"
 #include "gamemap.h"
+#include "ornaments/ornament.h"
 #include "hero.h"
 #include "logging.h"
 
@@ -57,12 +58,18 @@ void MapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
         return;
 
     Creature* creature = gamemap->at(mDestPoint.x, mDestPoint.y)->creature;
+    Ornament* ornament = gamemap->at(mDestPoint.x, mDestPoint.y)->ornament;
+    float dist = gamemap->calcDistance(hero->x, hero->y, mDestPoint.x, mDestPoint.y);
+
     if (creature != NULL) {
         if (gamemap->calcDistance(creature->x, creature->y, hero->x, hero->y) <= hero->attackRange()) {
             if (!startAttacking(creature)) {
                 onAttackFinished(hero, creature);
             }
         }
+    } else if (ornament != NULL && dist < 2) {
+        if (ornament->active())
+            mMapWrapper->refresh();
     } else {
         mMapWrapper->mGridPosition = mDestPoint;
         mMapWrapper->showGrid(true);
@@ -113,10 +120,26 @@ bool MapLayer::moveBy1Grid()
 
     if (mDestPoint.x != hero->x || mDestPoint.y != hero->y) {
         FpHelper    ch;
-        if (!gamemap->findPath(hero->x, hero->y, mDestPoint.x, mDestPoint.y, ch)) {
-            ch.nodes.clear();
-            if (!gamemap->findPath1Step(hero->x, hero->y, mDestPoint.x, mDestPoint.y, ch)) {
+        if (gamemap->calcDistance(hero->x, hero->y, mDestPoint.x, mDestPoint.y) > 1.0f) {
+            if (!gamemap->findPathTo(hero->x, hero->y, mDestPoint.x, mDestPoint.y, ch)) {
+                ch.nodes.clear();
+                if (!gamemap->findPath1Step(hero->x, hero->y, mDestPoint.x, mDestPoint.y, ch)) {
+                    return false;
+                }
+            }
+        } else {
+            Creature* creature = gamemap->at(mDestPoint.x, mDestPoint.y)->creature;
+            Ornament* ornament = gamemap->at(mDestPoint.x, mDestPoint.y)->ornament;
+            if (creature != NULL)
                 return false;
+            if (ornament != NULL) {
+                if (ornament->active()) {
+                    mMapWrapper->refresh();
+                }
+                return false;
+            } else {
+                ch.nodes.push_back(ccp(hero->x, hero->y));
+                ch.nodes.push_back(mDestPoint);
             }
         }
         if (ch.nodes.empty())
