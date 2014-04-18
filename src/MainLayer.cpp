@@ -66,6 +66,17 @@ void MainLayer::onMenuExamine(cocos2d::CCObject* pSender)
 
 void MainLayer::onMenuHero(cocos2d::CCObject* pSender)
 {
+    if (mMapLayer->isVisible()) {
+        mMapLayer->setTouchEnabled(false);
+        mStatusLayer->setTouchEnabled(true);
+        mStatusLayer->setVisible(true);
+        mMapLayer->setVisible(false);
+    } else {
+        mStatusLayer->setTouchEnabled(false);
+        mMapLayer->setTouchEnabled(true);
+        mStatusLayer->setVisible(false);
+        mMapLayer->setVisible(true);
+    }
 }
 
 void MainLayer::onMenuStatus(cocos2d::CCObject* pSender)
