@@ -9,6 +9,7 @@
 #include <vector>
 #include "mapgenerator.h"
 #include "mapgenerator_room.h"
+#include "creature.h"
 #include "logging.h"
 
 
@@ -219,6 +220,20 @@ GameMap::Chunk::Chunk(GameMap::ChunkId _id, GameMap* gm)
     }
     // }}}
 #endif
+}
+
+GameMap::Chunk::~Chunk()
+{
+    int i, j;
+    for (j = 0; j < CHUNKHEIGHT; j++) {
+        for (i =0; i < CHUNKWIDTH; i++) {
+            GameMap::Node* n = &nodes[j][i];
+            if (n->creature != NULL && !n->creature->isHero())
+                delete n->creature;
+            if (n->ornament != NULL)
+                delete n->ornament;
+        }
+    }
 }
 
 GameMap::Node* GameMap::at(int x, int y)

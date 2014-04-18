@@ -34,6 +34,8 @@ public:
     virtual void StartWalkingAnimation(int dx, int dy);
     virtual void StopWalkingAnimation();
 
+    virtual bool isHero() { return false; }
+
     virtual bool findPathAndMove(int dx, int dy);
     virtual bool move(int dx, int dy, GameMap* mp);
     virtual bool attack(Creature& o, MapLayer* gml);

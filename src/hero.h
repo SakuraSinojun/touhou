@@ -21,6 +21,7 @@ class Hero : public Creature
     virtual bool attackAnimate(Creature& o, MapLayer* gml);
     virtual void StartWalkingAnimation(int dx, int dy);
     virtual void StopWalkingAnimation();
+    virtual bool isHero() { return true; }
 
     virtual int sight();
     virtual int senseRange();

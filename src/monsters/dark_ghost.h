@@ -15,7 +15,7 @@ public:
         mName = "DarkGhost";
         mAI = new ai::Normal(this);
     }
-    ~DarkGhost() {
+    virtual ~DarkGhost() {
         if (mAI) {
             delete mAI;
         }

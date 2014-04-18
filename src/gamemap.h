@@ -134,7 +134,7 @@ public:
     class Chunk {
     public:
         Chunk(ChunkId _id, GameMap* gm);
-        virtual ~Chunk() {}
+        virtual ~Chunk();
 
         Chunk* upper();
         Chunk* under();

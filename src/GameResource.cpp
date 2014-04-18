@@ -22,10 +22,10 @@ GameResource::GameResource()
 
 GameResource::~GameResource()
 {
-    if (mHero)
-        delete mHero;
     if (mGameMap)
         delete mGameMap;
+    if (mHero)
+        delete mHero;
 }
 
 GameResource* GameResource::getInstance()
