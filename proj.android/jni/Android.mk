@@ -11,8 +11,6 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../src/AppDelegate.cpp \
                    ../../src/MainScene.cpp \
                    ../../src/HeroCreator.cpp \
-                   ../../src/GameScene.cpp \
-                   ../../src/GameMapLayer.cpp \
                    ../../src/MapTile.cpp \
                    ../../src/gamemap.cpp \
                    ../../src/StatusLayer.cpp \
@@ -21,7 +19,17 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../src/mapgenerator_room.cpp \
                    ../../src/HpBar.cpp \
                    ../../src/ai/normal.cpp \
+				   ../../src/monsters/monster.cpp \
+				   ../../src/ornaments/ornament.cpp \
+				   ../../src/ornaments/chest.cpp \
+				   ../../src/ornaments/door.cpp \
+				   ../../src/items/item.cpp \
                    ../../src/GameOverScene.cpp \
+                   ../../src/PlayingScene.cpp \
+                   ../../src/MainLayer.cpp \
+                   ../../src/MapLayer.cpp \
+                   ../../src/MapWrapper.cpp \
+                   ../../src/GameResource.cpp \
                    ../../src/dice.cpp
                    
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../src
