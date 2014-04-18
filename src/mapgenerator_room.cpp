@@ -8,6 +8,7 @@
 #include "monsters/monster.h"
 #include "ornaments/ornament.h"
 #include "ornaments/door.h"
+#include "items/item.h"
 
 #include "logging.h"
 
@@ -191,6 +192,11 @@ void MapGeneratorRoom::makeRoom(int x, int y, int w, int h)
                 }
                 if (n->creature == NULL) {
                     n->ornament = Ornament::create();
+                }
+                if (d == 3) {
+                    if (n->creature == NULL && n->ornament == NULL) {
+                        n->items.push_back(Item::create());
+                    }
                 }
             }
         }

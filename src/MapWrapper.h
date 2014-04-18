@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "MapTile.h"
 #include "GameResource.h"
+#include "common/weak_ptr.h"
 #include "logging.h"
 
 class Creature;
@@ -15,7 +16,7 @@ public:
     virtual ~ProjectileCallback() {}
 
     void set(Creature* c) { mCreature = c; }
-    virtual void operator()();
+    virtual void onProjectileFinished();
 protected:
     Creature*   mCreature;
 };
@@ -44,7 +45,6 @@ private:
     void onProjectileMoveFinished(cocos2d::CCNode* pSender, void* data);
     class Projectile {
     public:
-        Projectile() : mProjectile(NULL), mProjectileCallback(NULL) {}
         Projectile(cocos2d::CCNode* p, ProjectileCallback* cb) : mProjectile(p), mProjectileCallback(cb) {}
         cocos2d::CCNode*        mProjectile;
         ProjectileCallback*     mProjectileCallback;

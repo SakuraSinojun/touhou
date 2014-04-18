@@ -232,6 +232,12 @@ GameMap::Chunk::~Chunk()
                 delete n->creature;
             if (n->ornament != NULL)
                 delete n->ornament;
+            if (!n->items.empty()) {
+                std::list<Item*>::iterator it;
+                for (it = n->items.begin(); it != n->items.end(); it++) {
+                    delete *it;
+                }
+            }
         }
     }
 }
@@ -348,6 +354,12 @@ void GameMap::centerMap(int x, int y)
     genChunks();
 }
 
+bool GameMap::isNodeCanBeSeen(int dx, int dy, int fx, int fy)
+{
+    Node* n1 = at(dx, dy);
+    Node* n2 = at(fx, fy);
+    return isNodeCanBeSeen(n1, n2);
+}
 
 bool GameMap::isNodeCanBeSeen(Node* n, Node* from)
 {

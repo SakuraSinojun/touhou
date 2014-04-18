@@ -12,6 +12,7 @@
 #include <string>
 
 class MapLayer;
+class Item;
 class Creature : public SupportsWeakPtr<Creature>, public cocos2d::CCObject
 {
 public:
@@ -45,6 +46,7 @@ public:
     virtual void onAttackFinished(cocos2d::CCObject* pSender);
     std::string name() { return mName; }
 
+    std::list<Item*>    items;
 protected:
     virtual bool fireBall(Creature&o, MapLayer* gml);
 

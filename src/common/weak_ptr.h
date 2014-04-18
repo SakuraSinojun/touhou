@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "ref_cnt.h"
 #include "scoped_refptr.h"
 

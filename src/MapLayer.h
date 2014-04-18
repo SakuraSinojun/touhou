@@ -37,6 +37,7 @@ private:
     void removeActiveCreature(Creature* c);
     void addActiveCreature(Creature* c);
     void onCreatureDie(Creature* c, Creature* attacker);
+    void pickUp(cocos2d::CCPoint point);
 };
 
 

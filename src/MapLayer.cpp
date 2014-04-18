@@ -53,28 +53,48 @@ void MapLayer::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
     CCPoint pt = touch->getLocation();
     mDestPoint = pointToMap(pt);
 
-    // TODO: touch self
-    if (mDestPoint.x == hero->x && mDestPoint.y == hero->y)
+    GameMap::Node* node = gamemap->at(mDestPoint.x, mDestPoint.y);
+    if (node == NULL)
         return;
-
-    Creature* creature = gamemap->at(mDestPoint.x, mDestPoint.y)->creature;
-    Ornament* ornament = gamemap->at(mDestPoint.x, mDestPoint.y)->ornament;
+    Creature* creature = node->creature;
+    Ornament* ornament = node->ornament;
+    Item*     item     = NULL;
+    if (!node->items.empty())
+        item = node->items.front();
     float dist = gamemap->calcDistance(hero->x, hero->y, mDestPoint.x, mDestPoint.y);
 
-    if (creature != NULL) {
+    if (creature != NULL && !creature->isHero()) {
         if (gamemap->calcDistance(creature->x, creature->y, hero->x, hero->y) <= hero->attackRange()) {
             if (!startAttacking(creature)) {
-                onAttackFinished(hero, creature);
+                // onAttackFinished(hero, creature);
+                onAttackFinished(NULL, NULL);
             }
         }
     } else if (ornament != NULL && dist < 2) {
         if (ornament->active())
             mMapWrapper->refresh();
+    } else if (item != NULL && dist < 2) {
+        pickUp(mDestPoint);
+        mMapWrapper->refresh();
     } else {
+        if (mDestPoint.x == hero->x && mDestPoint.y == hero->y)
+            return;
         mMapWrapper->mGridPosition = mDestPoint;
         mMapWrapper->showGrid(true);
         startMoving();
     }
+}
+
+void MapLayer::pickUp(CCPoint point)
+{
+    Hero* hero = GameResource::getInstance()->hero();
+    GameMap* gamemap = GameResource::getInstance()->gameMap();
+    GameMap::Node* node = gamemap->at(point);
+    if (node->items.empty())
+        return;
+    Item* item = node->items.front();
+    node->items.pop_front();
+    hero->items.push_back(item);
 }
 
 bool MapLayer::startAttacking(Creature* c)
@@ -92,6 +112,7 @@ bool MapLayer::startAttacking(Creature* c)
 void MapLayer::onAttackFinished(Creature* attacker, Creature* c)
 {
     mIsAttacking = false;
+    this->setTouchEnabled(true);
     if (c == NULL)
         return;
     if (c->currentHp() <= 0) {
@@ -128,14 +149,23 @@ bool MapLayer::moveBy1Grid()
                 }
             }
         } else {
-            Creature* creature = gamemap->at(mDestPoint.x, mDestPoint.y)->creature;
-            Ornament* ornament = gamemap->at(mDestPoint.x, mDestPoint.y)->ornament;
+            GameMap::Node* node = gamemap->at(mDestPoint.x, mDestPoint.y);
+            Creature* creature = node->creature;
+            Ornament* ornament = node->ornament;
+            Item*     item     = NULL;
+            if (!node->items.empty())
+                item = node->items.front();
+
             if (creature != NULL)
                 return false;
             if (ornament != NULL) {
                 if (ornament->active()) {
                     mMapWrapper->refresh();
                 }
+                return false;
+            } else if (item != NULL) {
+                pickUp(mDestPoint);
+                mMapWrapper->refresh();
                 return false;
             } else if (gamemap->at(mDestPoint.x, mDestPoint.y)->canPass()) {
                 ch.nodes.push_back(ccp(hero->x, hero->y));

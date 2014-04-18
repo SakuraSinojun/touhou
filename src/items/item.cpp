@@ -4,8 +4,15 @@
 
 #include "GameResource.h"
 
+#include "sword.h"
+
 
 USING_NS_CC;
+
+Item* Item::create()
+{
+    return new Sword();
+}
 
 Item::Item()
     : mSprite(NULL)

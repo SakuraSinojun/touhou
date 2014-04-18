@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "cocos2d.h"
 #include "ornaments/ornament.h"
+#include "items/item.h"
 
 #define CHUNKWIDTH  16
 #define CHUNKHEIGHT CHUNKWIDTH
@@ -75,6 +76,7 @@ public:
         BIOME   biome;
         bool explored;
         Ornament* ornament;
+        std::list<Item*>    items;
         bool blocksight;
         bool canpass;
     };
@@ -157,6 +159,7 @@ public:
     ~GameMap();
 
     Node* at(int x, int y);
+    Node* at(cocos2d::CCPoint pt) { return at(pt.x, pt.y); }
     void centerMap(int x, int y);
 
     Chunk* findChunk(ChunkId id);
@@ -175,6 +178,7 @@ public:
     bool findPath1Step(int x0, int y0, int x1, int y1, FpCallbackFunctor& fp);
 
     bool isNodeCanBeSeen(Node* n, Node* from);
+    bool isNodeCanBeSeen(int dx, int dy, int fx, int fy);
     float calcDistance(Node* n1, Node* n2);
     float calcDistance(int x0, int y0, int x1, int y1);
 

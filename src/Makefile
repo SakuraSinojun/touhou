@@ -23,6 +23,7 @@ SOURCES = 	main.cpp \
         	ornaments/chest.cpp \
         	ornaments/door.cpp \
         	items/item.cpp \
+        	items/sword.cpp \
         	GameOverScene.cpp \
         	PlayingScene.cpp \
         	MainLayer.cpp \

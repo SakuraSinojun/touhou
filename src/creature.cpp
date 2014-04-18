@@ -24,9 +24,9 @@ Creature::Creature()
 
 Creature::~Creature()
 {
-    if (mSprite)
+    if (mSprite != NULL)
         delete mSprite;
-    if (mHpBar)
+    if (mHpBar != NULL)
         delete mHpBar;
 }
 
@@ -122,6 +122,8 @@ bool Creature::attack(Creature& o, MapLayer* gml)
 
     if (!attackAnimate(o, gml))
         return false;
+    if (!isHero())
+        gml->setTouchEnabled(false);
     return true;
 }
 
@@ -223,6 +225,8 @@ bool Creature::findPathAndMove(int dx, int dy)
 bool Creature::fireBall(Creature&o, MapLayer* gml)
 {
     CCParticleMeteor* pm = CCParticleMeteor::create();
+    if (!GameResource::getInstance()->gameMap()->isNodeCanBeSeen(o.x, o.y, x, y))
+        return false;
     pm->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fireball.png"));
     pm->setScale(0.2f);
 

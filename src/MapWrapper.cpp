@@ -8,7 +8,7 @@
 
 USING_NS_CC;
 
-void ProjectileCallback::operator()()
+void ProjectileCallback::onProjectileFinished()
 {
     if (mCreature != NULL) {
         mCreature->onAttackFinished(NULL);
@@ -108,6 +108,8 @@ void MapWrapper::refresh()
             tiles[i][j]->setPosition(ccp(cx, cy));
             tiles[i][j]->setType(n->type);
 
+#if 0
+            // 探索视野
             // TODO 不应该在这里
             if (!n->explored) {
                 if (gamemap->isNodeCanBeSeen(n, heronode)) {
@@ -116,6 +118,10 @@ void MapWrapper::refresh()
             }
 
             tiles[i][j]->setVisible(n->explored);
+#else
+            // 正常视野
+            tiles[i][j]->setVisible(gamemap->isNodeCanBeSeen(n, heronode));
+#endif
 
             if (n->creature != NULL) {
                 CCSprite* s = n->creature->getSprite();
@@ -138,7 +144,18 @@ void MapWrapper::refresh()
                     s->setPosition(ccp(cx, cy));
                     s->setVisible(tiles[i][j]->isVisible());
                     if (this->getChildByTag(s->getTag()) == NULL) {
-                        this->addChild(s, 10);
+                        this->addChild(s, 1);
+                    }
+                }
+            }
+            if (!n->items.empty()) {
+                Item* item = n->items.front();
+                CCSprite* s = item->Sprite();
+                if (s != NULL) {
+                    s->setPosition(ccp(cx, cy));
+                    s->setVisible(tiles[i][j]->isVisible());
+                    if (this->getChildByTag(s->getTag()) == NULL) {
+                        this->addChild(s, 2);
                     }
                 }
             }
@@ -197,9 +214,11 @@ void MapWrapper::onProjectileMoveFinished(cocos2d::CCNode* pSender, void* data)
     Projectile * pj = (Projectile*)data;
     if (pj->mProjectile)
         this->removeChild(pj->mProjectile);
-    if (pj->mProjectileCallback)
-        (*pj->mProjectileCallback)();
+    if (pj->mProjectileCallback != NULL) {
+        pj->mProjectileCallback->onProjectileFinished();
+    }
 }
+
 
 
 
